@@ -4,6 +4,11 @@ import PackageDescription
 
 let package = Package(
     name: "PowerAuth",
+    platforms: [
+        .iOS(.v9),
+        .tvOS(.v9),
+        .macOS(.v10_15)
+    ],
     products: [
         .library(
             name: "PowerAuth",
