@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "PowerAuthShared",
+        "repositoryURL": "https://github.com/wultra/powerauth-apple-shared.git",
+        "state": {
+          "branch": "develop",
+          "revision": "e7e732a3ab7e0a3ddf6d5dd2a25710c749639aa4",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}

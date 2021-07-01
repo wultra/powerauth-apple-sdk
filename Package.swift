@@ -15,11 +15,12 @@ let package = Package(
             targets: ["PowerAuth"]),
     ],
     dependencies: [
+        .package(name: "PowerAuthShared", url: "https://github.com/wultra/powerauth-apple-shared.git", .branch("develop"))
     ],
     targets: [
         .target(
             name: "PowerAuth",
-            dependencies: []),
+            dependencies: ["PowerAuthShared"]),
         .testTarget(
             name: "PowerAuthTests",
             dependencies: ["PowerAuth"]),
