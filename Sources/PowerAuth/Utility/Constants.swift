@@ -25,6 +25,8 @@ enum Constants {
         static let APP_SECRET_SIZE = 16
         /// External encryption key's size.
         static let EEK_SIZE = 16
+        /// Size of stored possession or biometry factor key.
+        static let SIGNATURE_FACTOR_KEY_SIZE = 16
     }
     
     enum KeychainNames {

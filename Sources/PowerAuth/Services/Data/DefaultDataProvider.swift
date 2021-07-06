@@ -16,6 +16,7 @@
 
 import Foundation
 import PowerAuthShared
+import PowerAuthCore
 import LocalAuthentication
 
 /// The `DefaultDataProvider` class implements `DataProvider` protocol with using system
@@ -62,16 +63,25 @@ class DefaultDataProvider: DataProvider {
     let tokenStoreKeychain: PowerAuthKeychain
     
     func save(activationState: Data) throws {
-        try statusKeychain.set(activationState, forKey: instanceIdentifier)
+        do {
+            try statusKeychain.set(activationState, forKey: instanceIdentifier)
+        } catch {
+            D.error("DefaultDataProvider failed to save activation state: \(error.localizedDescription)")
+            throw PowerAuthError.wrap(error)
+        }
     }
     
     func activationState() throws -> Data? {
-        return try statusKeychain.data(forKey: instanceIdentifier)
+        return try? statusKeychain.data(forKey: instanceIdentifier)
     }
     
     func possessionFactorEncryptionKey() throws -> Data {
-        D.notImplementedYet()
-        return try possessionKeychain.data(forKey: keychainKeyForPossesionFactor, orSet: Data(count: 16))
+        do {
+            return try possessionKeychain.data(forKey: keychainKeyForPossesionFactor, orSet: try CryptoUtils.randomBytes(count: Constants.KeySizes.SIGNATURE_FACTOR_KEY_SIZE))
+        } catch {
+            D.error("DefaultDataProvider failed to acquire possesion factor key: \(error.localizedDescription)")
+            throw PowerAuthError.wrap(error)
+        }
     }
     
     func hasBiometryFactorEncryptionKey() -> Bool {
@@ -79,11 +89,33 @@ class DefaultDataProvider: DataProvider {
     }
     
     func biometryFactorEncryptionKey(authentication: LAContext) throws -> Data {
-        D.notImplementedYet()
+        do {
+            guard let key = try biometryKeychain.data(forKey: keychainKeyForBiometryFactor, authentication: authentication) else {
+                throw PowerAuthError.biometricAuthenticationFailed(reason: .notConfigured)
+            }
+            return key
+        } catch PowerAuthKeychainError.biometryNotAvailable {
+            throw PowerAuthError.biometricAuthenticationFailed(reason: .notAvailable)
+        } catch {
+            D.error("DefaultDataProvider failed to acquire biometry factor key: \(error.localizedDescription)")
+            throw PowerAuthError.wrap(error)
+        }
     }
     
     func save(biometryFactorEncryptionKey: Data) throws {
-        try biometryKeychain.set(biometryFactorEncryptionKey, for: keychainKeyForBiometryFactor, access: keychainItemAccessForBiometryFactor)
+        do {
+            try biometryKeychain.set(biometryFactorEncryptionKey, for: keychainKeyForBiometryFactor, access: keychainItemAccessForBiometryFactor)
+        } catch {
+            throw PowerAuthError.wrap(error)
+        }
+    }
+    
+    func removeBiometryFactorEncryptionKey() throws {
+        do {
+            try biometryKeychain.remove(forKey: keychainKeyForBiometryFactor)
+        } catch {
+            throw PowerAuthError.wrap(error)
+        }
     }
 }
 

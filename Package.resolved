@@ -9,6 +9,15 @@
           "revision": "e7e732a3ab7e0a3ddf6d5dd2a25710c749639aa4",
           "version": null
         }
+      },
+      {
+        "package": "PowerAuthCore",
+        "repositoryURL": "https://github.com/wultra/powerauth-client-core.git",
+        "state": {
+          "branch": "beta-releases",
+          "revision": "8e06601f3163213c0be45b1a1e2b6ea6ce424563",
+          "version": null
+        }
       }
     ]
   },

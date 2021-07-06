@@ -19,6 +19,8 @@ import Foundation
 /// `PowerAuthError` is the error type returned by PowerAuth SDK.
 public enum PowerAuthError: Error {
     
+    // Configuration & State
+    
     /// The underlying reason the `.invalidConfiguration` error occured.
     public enum ConfigurationFailureReason {
         /// `Configuration` contains missing or invalid data.
@@ -43,21 +45,54 @@ public enum PowerAuthError: Error {
     /// The operation require a valid `PowerAuth` activation.
     case missingActivation
     
-    /// The biometric factor is not available.
-    case missingBiometricFactor
+    // Activation
+    
+    /// The underlying reason the `.invalidActivationData` error occured.
+    public enum ActivationDataFailureReason {
+        /// You have provided wrong activation code.
+        case wrongActivationCode
+        /// The signature scanned from QR code with activation code doesn't match.
+        case wrongActivationSignature
+        /// You have provided invalid recovery code.
+        case wrongRecoveryCode
+        /// You have provided invalid recovery PUK.
+        case wrongRecoveryPuk
+        /// Additional activation OTP can be used only in activation with activation code.
+        case otpInWrongActivationType
+        /// Provided additional activation OTP contains an empty string.
+        case emptyOtp
+    }
+    case invalidActivationData(reason: ActivationDataFailureReason)
+    
+    // Biometry
+    
+    /// The underlying reason the `.biometricAuthenticationFailed`
+    public enum BiometricFailureReason {
+        /// The biometric authentication is not supported on the device.
+        case notSupported
+        /// The biometric authentication is not available on the device.
+        case notAvailable
+        /// There's no enrolled biometry on the device.
+        case notEnrolled
+        /// The biometric factor is not configured in `PowerAuth` instance.
+        case notConfigured
+    }
+    
+    /// User did cancel the biometric authentication dialog.
+    case biometricAuthenticationCancel
+    
+    /// Authentication with biometry failed. Check the reason for more details.
+    case biometricAuthenticationFailed(reason: BiometricFailureReason)
     
     /// The requested token doesn't exist.
     case tokenNotFound
     
+    
+    // Protocol upgrade
+    
     /// The requested operation failed due to pending protocol upgrade.
     /// You can retry the operation later.
     case pendingProtocolUpgrade
-    
-    /// The requested operation was canceled by PowerAuth SDK. This kind of error may occur in situations, when SDK
-    /// needs to cancel an asynchronous operation, but the cancel is not initiated by the application
-    /// itself. For example, if you reset the state of `PowerAuth` during the pending
-    /// fetch for activation status, then the application gets this error in result.
-    case operationCanceled
     
     /// The protocol upgrade failure. The recommended action is to retry the status fetch
     /// operation, or remove the activation locally.
@@ -66,8 +101,20 @@ public enum PowerAuthError: Error {
     /// WatchConnectivity feature failure. Check the underlying error or debug log for more details.
     case watchConnectivity(reason: Error?)
     
+    
+    // Other errors
+    
+    /// The requested operation was canceled by PowerAuth SDK. This kind of error may occur in situations, when SDK
+    /// needs to cancel an asynchronous operation, but the cancel is not initiated by the application
+    /// itself. For example, if you reset the state of `PowerAuth` during the pending
+    /// fetch for activation status, then the application gets this error in result.
+    case operationCanceled
+    
     /// The operation failed with an unexpected error.
     case unexpectedFailure(reason: Error?)
+    
+    /// An internal error or internal data inconsistency in PowerAuth SDK.
+    case internalError(reason: String, underlyingError: Error? = nil)
 }
 
 public extension PowerAuthError {
@@ -81,6 +128,8 @@ public extension PowerAuthError {
                 return error
             case let .watchConnectivity(error):
                 return error
+            case let .internalError(_, underlyingError):
+                return underlyingError
             default:
                 return nil
         }

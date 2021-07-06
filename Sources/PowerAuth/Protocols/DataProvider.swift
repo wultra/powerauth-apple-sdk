@@ -24,15 +24,6 @@ protocol DataProvider {
     
     // MARK: - Keychains
     
-    /// Contains reference to keychain containing activation status data.
-    var statusKeychain: PowerAuthKeychain { get }
-    
-    /// Contains reference to keychain containing possession keys.
-    var possessionKeychain: PowerAuthKeychain { get }
-    
-    /// Contains reference to keychain containing biometry factor encryption key.
-    var biometryKeychain: PowerAuthKeychain { get }
-    
     /// Contains reference to keychain containing tokens data.
     var tokenStoreKeychain: PowerAuthKeychain { get }
    
@@ -68,4 +59,8 @@ protocol DataProvider {
     /// - Parameter biometryFactorEncryptionKey: Key to save.
     /// - Throws: `PowerAuthError` in case of failure.
     func save(biometryFactorEncryptionKey: Data) throws
+    
+    /// Function removes biometry factor encryption key.
+    /// - Throws: `PowerAuthError` in case of failure.
+    func removeBiometryFactorEncryptionKey() throws
 }

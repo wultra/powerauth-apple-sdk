@@ -15,7 +15,7 @@
 //
 
 import XCTest
-import PowerAuth
+@testable import PowerAuth
 
 final class PowerAuthBuilderTests: XCTestCase {
 
@@ -52,7 +52,11 @@ final class PowerAuthBuilderTests: XCTestCase {
         XCTAssertEqual(BiometryConfiguration.default, powerAuth.biometryConfiguration)
         XCTAssertEqual(HttpClientConfiguration.default, powerAuth.httpClientConfiguration)
         XCTAssertEqual(KeychainConfiguration.default, powerAuth.keychainConfiguration)
+        
         // Now try a custom config
+        // Before that, cleanup cached instances in keychain factory
+        try KeychainFactory.factory(for: powerAuth.keychainConfiguration).removeAllCachedInstances()
+        
         powerAuth = try PowerAuth.Builder(configuration: instanceConfig)
             .set(biometryConfiguration: biometryConfig)
             .set(keychainConfiguration: keychainConfig)

@@ -18,6 +18,9 @@ import Foundation
 
 class DefaultHttpClient: HttpClient {
     
+    let configuration: HttpClientConfiguration
+    
     init(with configuration: HttpClientConfiguration) {
+        self.configuration = configuration
     }
 }
