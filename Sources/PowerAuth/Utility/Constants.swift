@@ -49,5 +49,10 @@ enum Constants {
     enum Http {
         /// Defines default connection timeout used by internal HTTP client.
         static let defaultConnectionTimeout: TimeInterval = 20.0
+        
+        /// Constant for PowerAuth authorization header name.
+        static let authorizationHeaderName = "X-PowerAuth-Authorization"
+        /// Constant for PowerAuth token header name.
+        static let tokenHeaderName = "X-PowerAuth-Token"
     }
 }

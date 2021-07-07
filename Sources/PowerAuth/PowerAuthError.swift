@@ -62,6 +62,8 @@ public enum PowerAuthError: Error {
         /// Provided additional activation OTP contains an empty string.
         case emptyOtp
     }
+    
+    /// Data provided to `Activation` structure are invalid.
     case invalidActivationData(reason: ActivationDataFailureReason)
     
     // Biometry

@@ -59,11 +59,24 @@ public extension PowerAuthActivation {
         
         let activationType: ActivationType
         let identityAttributes: [String:String]
-        var activationCode: ActivationCode?
+        var activationCode: PowerAuthCore.ActivationCode?
         var name: String?
         var extras: String?
         var customAttributes: [String:Any]?
         var additionalActivationOtp: String?
+        
+        /// Construct `Builder` for building activation with an already parsed activation code.
+        ///
+        /// - Parameters:
+        ///   - activationCode: Activation code, obtained either via QR code scanning or by manual entry.
+        ///   - activationName: Activation name to be used for the activation.
+        /// - Throws: `PowerAuthError.invalidActivationData` in case that wrong activation code is provided.
+        public init(withActivationCode activationCode: PowerAuthActivationCode, activationName: String? = nil) {
+            self.activationType = .activationCode
+            self.identityAttributes = [ "code" : activationCode.activationCode ]
+            self.activationCode = activationCode.coreActivationCode
+            self.name = activationName
+        }
         
         /// Construct `Builder` for building activation with an activation code. The activation code may contain
         /// an optional signature part, in case that it is scanned from QR code.

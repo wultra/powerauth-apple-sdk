@@ -50,6 +50,45 @@ final class PowerAuthActicationTests: XCTestCase {
         XCTAssertEqual(1, act3.customAttributes?["customInt"] as? Int)
         XCTAssertEqual("STR", act3.customAttributes?["customString"] as? String)
     }
+
+    func testRegularActivationWithParsedCode() throws {
+        guard let code1 = PowerAuthActivationCode.parse(fromActivationCode: "VVVVV-VVVVV-VVVVV-VTFVA") else {
+            XCTFail(); return
+        }
+        let act1 = try PowerAuthActivation.Builder(withActivationCode: code1).build()
+        XCTAssertEqual(.activationCode, act1.activationType)
+        XCTAssertEqual(["code":"VVVVV-VVVVV-VVVVV-VTFVA"], act1.identityAttributes)
+        XCTAssertNil(act1.name)
+        XCTAssertNil(act1.extras)
+        XCTAssertNil(act1.customAttributes)
+        
+        guard let code2 = PowerAuthActivationCode.parse(fromActivationCode: "3PZ2Z-DOXSL-PSSQI-I5VBA#MEQCIHP3LQ7WLDEPe8WCgdQ8CSwyxbErroYlGO+K6pIX1JyhAiAn6wEnaNp1mDdKlWb16Ma8eTKycRcZ+75TYV/zn0yvFw==") else {
+            XCTFail(); return
+        }
+        let act2 = try PowerAuthActivation.Builder(withActivationCode: code2, activationName: "Troyplatnitchka")
+            .build()
+        XCTAssertEqual(.activationCode, act2.activationType)
+        XCTAssertEqual(["code":"3PZ2Z-DOXSL-PSSQI-I5VBA"], act2.identityAttributes)
+        XCTAssertEqual("3PZ2Z-DOXSL-PSSQI-I5VBA", act2.activationCode?.activationCode)
+        XCTAssertEqual("MEQCIHP3LQ7WLDEPe8WCgdQ8CSwyxbErroYlGO+K6pIX1JyhAiAn6wEnaNp1mDdKlWb16Ma8eTKycRcZ+75TYV/zn0yvFw==", act2.activationCode?.activationSignature)
+        XCTAssertEqual("Troyplatnitchka", act2.name)
+        
+        guard let code3 = PowerAuthActivationCode.parse(fromActivationCode: "55555-55555-55555-55YMA") else {
+            XCTFail(); return
+        }
+        let act3 = try PowerAuthActivation.Builder(withActivationCode: code3, activationName: "Troyplatnitchka")
+            .set(additionalActivationOtp: "1234")
+            .set(extras: "EXTRAS")
+            .set(customAttributes: ["customInt":1, "customString":"STR"])
+            .build()
+        XCTAssertEqual(["code":"55555-55555-55555-55YMA"], act3.identityAttributes)
+        XCTAssertEqual("55555-55555-55555-55YMA", act3.activationCode?.activationCode)
+        XCTAssertEqual("1234", act3.additionalActivationOtp)
+        XCTAssertEqual("Troyplatnitchka", act3.name)
+        XCTAssertEqual("EXTRAS", act3.extras)
+        XCTAssertEqual(1, act3.customAttributes?["customInt"] as? Int)
+        XCTAssertEqual("STR", act3.customAttributes?["customString"] as? String)
+    }
     
     func testRegularActivationInvalid() throws {
         do {
