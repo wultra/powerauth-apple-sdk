@@ -17,7 +17,7 @@
 import XCTest
 import PowerAuth
 
-final class PowerAuthActicationCodeTests: XCTestCase {
+final class ActicationCodeTests: XCTestCase {
     
     // MARK: Activation code
     
@@ -42,7 +42,7 @@ final class PowerAuthActicationCodeTests: XCTestCase {
             "ZKMVN-4IMFK-FLSYX-ARRGA",
             "NQHGX-LNM2S-EQ4NT-G3NAA",
         ].forEach { code in
-            XCTAssertTrue(PowerAuthActivationCodeValidator.validate(activationCode: code))
+            XCTAssertTrue(ActivationCodeValidator.validate(activationCode: code))
         }
         // Invalid codes
         [
@@ -63,12 +63,12 @@ final class PowerAuthActicationCodeTests: XCTestCase {
             "67AAB-BB1CCEDDEEF-GGHHI",
             "67AAA-BBBCC-DDEEFZGGHHI",
         ].forEach { code in
-            XCTAssertFalse(PowerAuthActivationCodeValidator.validate(activationCode: code))
+            XCTAssertFalse(ActivationCodeValidator.validate(activationCode: code))
         }
     }
     
     func testActivationCodeParser() throws {
-        var result: PowerAuthActivationCode?
+        var result: ActivationCode?
         // Valid codes
         result = .parse(fromActivationCode: "BBBBB-BBBBB-BBBBB-BTA6Q")
         XCTAssertEqual("BBBBB-BBBBB-BBBBB-BTA6Q", result?.activationCode)
@@ -99,7 +99,7 @@ final class PowerAuthActicationCodeTests: XCTestCase {
             "WWWWW-WWWWW-WWWWW-WNR7A#ABA=#",
             "XXXXX-XXXXX-XXXXX-X6RBQ#ABA-="
         ].forEach { code in
-            XCTAssertNil(PowerAuthActivationCode.parse(fromActivationCode:code))
+            XCTAssertNil(ActivationCode.parse(fromActivationCode:code))
         }
     }
     // MARK: Characters validation
@@ -124,23 +124,23 @@ final class PowerAuthActicationCodeTests: XCTestCase {
         }
         // Invalid characters
         "89-=#$%^&!@#-=';()".unicodeScalars.forEach { scalar in
-            XCTAssertNil(PowerAuthActivationCodeValidator.validateAndCorrect(typedCharacter: scalar))
+            XCTAssertNil(ActivationCodeValidator.validateAndCorrect(typedCharacter: scalar))
         }
     }
     
     func autoCorrect(string: String) -> String {
         let result = string.unicodeScalars
-            .map { PowerAuthActivationCodeValidator.validateAndCorrect(typedCharacter: $0) ?? "\u{00}" }
+            .map { ActivationCodeValidator.validateAndCorrect(typedCharacter: $0) ?? "\u{00}" }
             .map { Character($0) }
         return String(result)
      }
     
     func testCharValidation() throws {
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567".unicodeScalars.forEach { scalar in
-            XCTAssertTrue(PowerAuthActivationCodeValidator.validate(typedCharacter: scalar))
+            XCTAssertTrue(ActivationCodeValidator.validate(typedCharacter: scalar))
         }
         "abcdefghijklmnopqrstuvwxyz0189-=#$%^&!@#-=';()".unicodeScalars.forEach { scalar in
-            XCTAssertFalse(PowerAuthActivationCodeValidator.validate(typedCharacter: scalar))
+            XCTAssertFalse(ActivationCodeValidator.validate(typedCharacter: scalar))
         }
     }
     
@@ -173,7 +173,7 @@ final class PowerAuthActicationCodeTests: XCTestCase {
             "R:ZKMVN-4IMFK-FLSYX-ARRGA",
             "R:NQHGX-LNM2S-EQ4NT-G3NAA",
         ].forEach { code in
-            XCTAssertTrue(PowerAuthActivationCodeValidator.validate(recoveryCode: code))
+            XCTAssertTrue(ActivationCodeValidator.validate(recoveryCode: code))
         }
         // Invalid
         [
@@ -201,7 +201,7 @@ final class PowerAuthActicationCodeTests: XCTestCase {
             "67AAB-BB1CCEDDEEF-GGHHI",
             "67AAA-BBBCC-DDEEFZGGHHI",
         ].forEach { code in
-            XCTAssertFalse(PowerAuthActivationCodeValidator.validate(recoveryCode: code))
+            XCTAssertFalse(ActivationCodeValidator.validate(recoveryCode: code))
         }
     }
     
@@ -215,7 +215,7 @@ final class PowerAuthActicationCodeTests: XCTestCase {
             "1111111111",
             "3487628763",
         ].forEach { puk in
-            XCTAssertTrue(PowerAuthActivationCodeValidator.validate(recoveryPuk: puk))
+            XCTAssertTrue(ActivationCodeValidator.validate(recoveryPuk: puk))
         }
         // Invalid
         [
@@ -245,13 +245,13 @@ final class PowerAuthActicationCodeTests: XCTestCase {
             "9 99999999",
             " 999999999",
         ].forEach { puk in
-            XCTAssertFalse(PowerAuthActivationCodeValidator.validate(recoveryPuk: puk))
+            XCTAssertFalse(ActivationCodeValidator.validate(recoveryPuk: puk))
         }
     }
     
     func testRecoveryCodesParser() throws {
         // Valid
-        var result: PowerAuthActivationCode?
+        var result: ActivationCode?
         result = .parse(fromRecoveryCode: "BBBBB-BBBBB-BBBBB-BTA6Q")
         XCTAssertEqual("BBBBB-BBBBB-BBBBB-BTA6Q", result?.activationCode)
         XCTAssertNil(result?.activationSignature)
@@ -275,7 +275,7 @@ final class PowerAuthActicationCodeTests: XCTestCase {
             "R:DDDDD-DDDDD-DDDDD-D6UKA#ABC=",
             "R:EEEEE-EEEEE-EEEEE-E2OXA#AB==",
         ].forEach { code in
-            XCTAssertNil(PowerAuthActivationCode.parse(fromRecoveryCode:code))
+            XCTAssertNil(ActivationCode.parse(fromRecoveryCode:code))
         }
     }
 }

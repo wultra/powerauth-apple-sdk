@@ -17,19 +17,19 @@
 import XCTest
 @testable import PowerAuth
 
-final class PowerAuthActicationTests: XCTestCase {
+final class ActicationTests: XCTestCase {
     
     // MARK: - Regular
     
     func testRegularActivation() throws {
-        let act1 = try PowerAuthActivation.Builder(withActivationCode: "VVVVV-VVVVV-VVVVV-VTFVA").build()
+        let act1 = try Activation.Builder(withActivationCode: "VVVVV-VVVVV-VVVVV-VTFVA").build()
         XCTAssertEqual(.activationCode, act1.activationType)
         XCTAssertEqual(["code":"VVVVV-VVVVV-VVVVV-VTFVA"], act1.identityAttributes)
         XCTAssertNil(act1.name)
         XCTAssertNil(act1.extras)
         XCTAssertNil(act1.customAttributes)
         
-        let act2 = try PowerAuthActivation.Builder(withActivationCode: "3PZ2Z-DOXSL-PSSQI-I5VBA#MEQCIHP3LQ7WLDEPe8WCgdQ8CSwyxbErroYlGO+K6pIX1JyhAiAn6wEnaNp1mDdKlWb16Ma8eTKycRcZ+75TYV/zn0yvFw==", activationName: "Troyplatnitchka")
+        let act2 = try Activation.Builder(withActivationCode: "3PZ2Z-DOXSL-PSSQI-I5VBA#MEQCIHP3LQ7WLDEPe8WCgdQ8CSwyxbErroYlGO+K6pIX1JyhAiAn6wEnaNp1mDdKlWb16Ma8eTKycRcZ+75TYV/zn0yvFw==", activationName: "Troyplatnitchka")
             .build()
         XCTAssertEqual(.activationCode, act2.activationType)
         XCTAssertEqual(["code":"3PZ2Z-DOXSL-PSSQI-I5VBA"], act2.identityAttributes)
@@ -37,7 +37,7 @@ final class PowerAuthActicationTests: XCTestCase {
         XCTAssertEqual("MEQCIHP3LQ7WLDEPe8WCgdQ8CSwyxbErroYlGO+K6pIX1JyhAiAn6wEnaNp1mDdKlWb16Ma8eTKycRcZ+75TYV/zn0yvFw==", act2.activationCode?.activationSignature)
         XCTAssertEqual("Troyplatnitchka", act2.name)
         
-        let act3 = try PowerAuthActivation.Builder(withActivationCode: "55555-55555-55555-55YMA", activationName: "Troyplatnitchka")
+        let act3 = try Activation.Builder(withActivationCode: "55555-55555-55555-55YMA", activationName: "Troyplatnitchka")
             .set(additionalActivationOtp: "1234")
             .set(extras: "EXTRAS")
             .set(customAttributes: ["customInt":1, "customString":"STR"])
@@ -52,20 +52,20 @@ final class PowerAuthActicationTests: XCTestCase {
     }
 
     func testRegularActivationWithParsedCode() throws {
-        guard let code1 = PowerAuthActivationCode.parse(fromActivationCode: "VVVVV-VVVVV-VVVVV-VTFVA") else {
+        guard let code1 = ActivationCode.parse(fromActivationCode: "VVVVV-VVVVV-VVVVV-VTFVA") else {
             XCTFail(); return
         }
-        let act1 = try PowerAuthActivation.Builder(withActivationCode: code1).build()
+        let act1 = try Activation.Builder(withActivationCode: code1).build()
         XCTAssertEqual(.activationCode, act1.activationType)
         XCTAssertEqual(["code":"VVVVV-VVVVV-VVVVV-VTFVA"], act1.identityAttributes)
         XCTAssertNil(act1.name)
         XCTAssertNil(act1.extras)
         XCTAssertNil(act1.customAttributes)
         
-        guard let code2 = PowerAuthActivationCode.parse(fromActivationCode: "3PZ2Z-DOXSL-PSSQI-I5VBA#MEQCIHP3LQ7WLDEPe8WCgdQ8CSwyxbErroYlGO+K6pIX1JyhAiAn6wEnaNp1mDdKlWb16Ma8eTKycRcZ+75TYV/zn0yvFw==") else {
+        guard let code2 = ActivationCode.parse(fromActivationCode: "3PZ2Z-DOXSL-PSSQI-I5VBA#MEQCIHP3LQ7WLDEPe8WCgdQ8CSwyxbErroYlGO+K6pIX1JyhAiAn6wEnaNp1mDdKlWb16Ma8eTKycRcZ+75TYV/zn0yvFw==") else {
             XCTFail(); return
         }
-        let act2 = try PowerAuthActivation.Builder(withActivationCode: code2, activationName: "Troyplatnitchka")
+        let act2 = try Activation.Builder(withActivationCode: code2, activationName: "Troyplatnitchka")
             .build()
         XCTAssertEqual(.activationCode, act2.activationType)
         XCTAssertEqual(["code":"3PZ2Z-DOXSL-PSSQI-I5VBA"], act2.identityAttributes)
@@ -73,10 +73,10 @@ final class PowerAuthActicationTests: XCTestCase {
         XCTAssertEqual("MEQCIHP3LQ7WLDEPe8WCgdQ8CSwyxbErroYlGO+K6pIX1JyhAiAn6wEnaNp1mDdKlWb16Ma8eTKycRcZ+75TYV/zn0yvFw==", act2.activationCode?.activationSignature)
         XCTAssertEqual("Troyplatnitchka", act2.name)
         
-        guard let code3 = PowerAuthActivationCode.parse(fromActivationCode: "55555-55555-55555-55YMA") else {
+        guard let code3 = ActivationCode.parse(fromActivationCode: "55555-55555-55555-55YMA") else {
             XCTFail(); return
         }
-        let act3 = try PowerAuthActivation.Builder(withActivationCode: code3, activationName: "Troyplatnitchka")
+        let act3 = try Activation.Builder(withActivationCode: code3, activationName: "Troyplatnitchka")
             .set(additionalActivationOtp: "1234")
             .set(extras: "EXTRAS")
             .set(customAttributes: ["customInt":1, "customString":"STR"])
@@ -92,13 +92,13 @@ final class PowerAuthActicationTests: XCTestCase {
     
     func testRegularActivationInvalid() throws {
         do {
-            _ = try PowerAuthActivation.Builder(withActivationCode: "1234")
+            _ = try Activation.Builder(withActivationCode: "1234")
                 .build()
         } catch PowerAuthError.invalidActivationData(let reason) {
             XCTAssertEqual(.wrongActivationCode, reason)
         }
         do {
-            _ = try PowerAuthActivation.Builder(withActivationCode: "VVVVV-VVVVV-VVVVV-VTFVA")
+            _ = try Activation.Builder(withActivationCode: "VVVVV-VVVVV-VVVVV-VTFVA")
                 .set(additionalActivationOtp: "")
                 .build()
         } catch PowerAuthError.invalidActivationData(let reason) {
@@ -109,7 +109,7 @@ final class PowerAuthActicationTests: XCTestCase {
     // MARK: - Recovery
     
     func testRecoveryActivation() throws {
-        let act1 = try PowerAuthActivation.Builder(withRecoveryCode: "VVVVV-VVVVV-VVVVV-VTFVA", puk: "0123456789")
+        let act1 = try Activation.Builder(withRecoveryCode: "VVVVV-VVVVV-VVVVV-VTFVA", puk: "0123456789")
             .build()
         XCTAssertEqual(.recoveryCode, act1.activationType)
         XCTAssertEqual(["recoveryCode" : "VVVVV-VVVVV-VVVVV-VTFVA" , "puk" : "0123456789"], act1.identityAttributes)
@@ -118,7 +118,7 @@ final class PowerAuthActicationTests: XCTestCase {
         XCTAssertNil(act1.customAttributes)
         XCTAssertNil(act1.activationCode)
         
-        let act2 = try PowerAuthActivation.Builder(withRecoveryCode: "R:3PZ2Z-DOXSL-PSSQI-I5VBA", puk: "0123456789", activationName: "John Tramonta")
+        let act2 = try Activation.Builder(withRecoveryCode: "R:3PZ2Z-DOXSL-PSSQI-I5VBA", puk: "0123456789", activationName: "John Tramonta")
             .set(extras: "EXTRAS")
             .set(customAttributes: ["customInt":1, "customString":"STR"])
             .build()
@@ -133,19 +133,19 @@ final class PowerAuthActicationTests: XCTestCase {
     
     func testRecoveryActivationInvalid() throws {
         do {
-            _ = try PowerAuthActivation.Builder(withRecoveryCode: "12345", puk: "0123456789")
+            _ = try Activation.Builder(withRecoveryCode: "12345", puk: "0123456789")
                 .build()
         } catch PowerAuthError.invalidActivationData(let reason) {
             XCTAssertEqual(.wrongRecoveryCode, reason)
         }
         do {
-            _ = try PowerAuthActivation.Builder(withRecoveryCode: "3PZ2Z-DOXSL-PSSQI-I5VBA", puk: "1234")
+            _ = try Activation.Builder(withRecoveryCode: "3PZ2Z-DOXSL-PSSQI-I5VBA", puk: "1234")
                 .build()
         } catch PowerAuthError.invalidActivationData(let reason) {
             XCTAssertEqual(.wrongRecoveryPuk, reason)
         }
         do {
-            _ = try PowerAuthActivation.Builder(withRecoveryCode: "VVVVV-VVVVV-VVVVV-VTFVA", puk: "0123456789")
+            _ = try Activation.Builder(withRecoveryCode: "VVVVV-VVVVV-VVVVV-VTFVA", puk: "0123456789")
                 .set(additionalActivationOtp: "1234")
                 .build()
         } catch PowerAuthError.invalidActivationData(let reason) {
@@ -156,7 +156,7 @@ final class PowerAuthActicationTests: XCTestCase {
     // MARK: - Custom
     
     func testCustomActivation() throws {
-        let act1 = try PowerAuthActivation.Builder(withIdentityAttributes: ["login":"johntramonta", "pass":"nbusr123"])
+        let act1 = try Activation.Builder(withIdentityAttributes: ["login":"johntramonta", "pass":"nbusr123"])
             .build()
         
         XCTAssertEqual(.custom, act1.activationType)
@@ -165,7 +165,7 @@ final class PowerAuthActicationTests: XCTestCase {
         XCTAssertNil(act1.extras)
         XCTAssertNil(act1.customAttributes)
         
-        let act2 = try PowerAuthActivation.Builder(withIdentityAttributes: ["login":"johntramonta", "pass":"nbusr123"], activationName: "John Tramonta")
+        let act2 = try Activation.Builder(withIdentityAttributes: ["login":"johntramonta", "pass":"nbusr123"], activationName: "John Tramonta")
             .set(extras: "EXTRAS")
             .set(customAttributes: ["customInt":1, "customString":"STR"])
             .build()
@@ -180,7 +180,7 @@ final class PowerAuthActicationTests: XCTestCase {
     
     func testCustomActivationInvalid() throws {
         do {
-            _ = try PowerAuthActivation.Builder(withIdentityAttributes: ["login":"johntramonta", "pass":"nbusr123"])
+            _ = try Activation.Builder(withIdentityAttributes: ["login":"johntramonta", "pass":"nbusr123"])
                 .set(additionalActivationOtp: "1234")
                 .build()
         } catch PowerAuthError.invalidActivationData(let reason) {

@@ -24,7 +24,7 @@ public extension PowerAuth {
     final class Builder {
         
         // Required
-        let powerAuthConfiguration: PowerAuthConfiguration
+        let powerAuthConfiguration: Configuration
         
         // Optional
         var keychainConfiguration: KeychainConfiguration?
@@ -37,7 +37,7 @@ public extension PowerAuth {
         
         /// Initialize `Builder` with required `Configuration` configuration.
         /// - Parameter configuration: `Configuration` structure
-        public init(configuration: PowerAuthConfiguration) {
+        public init(configuration: Configuration) {
             self.powerAuthConfiguration = configuration
         }
         

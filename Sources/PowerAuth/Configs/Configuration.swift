@@ -20,8 +20,8 @@ import Foundation
 
 
 /// Structure that represents `PowerAuth` instance configuration. You can use
-/// `PowerAuthConfiguration.Builder` builder class to prepare this structure.
-public struct PowerAuthConfiguration {
+/// `Configuration.Builder` builder class to prepare this structure.
+public struct Configuration {
     /// Identifier of the `PowerAuth` instance, used as a 'key' to store session state in the session state keychain.
     public let instanceId: String
     
@@ -49,9 +49,9 @@ public struct PowerAuthConfiguration {
 
 // MARK: - PowerAuthConfiguration.Builder -
 
-public extension PowerAuthConfiguration {
+public extension Configuration {
 
-    /// Class that builds `PowerAuthConfiguration` structure.
+    /// Class that builds `Configuration` structure.
     final class Builder {
         // Required
         let instanceId: String
@@ -101,12 +101,12 @@ public extension PowerAuthConfiguration {
             return self
         }
         
-        /// Build `PowerAuthConfiguration` structure from collected parameters.
+        /// Build `Configuration` structure from collected parameters.
         /// - Throws: `PowerAuthError.invalidConfiguration` in case that some parameter is invalid.
-        /// - Returns: `PowerAuthConfiguration` structure
-        public func build() throws -> PowerAuthConfiguration {
+        /// - Returns: `Configuration` structure
+        public func build() throws -> Configuration {
             try validateConfig()
-            return PowerAuthConfiguration(
+            return Configuration(
                 instanceId: instanceId,
                 baseEndpointUrl: baseEndpointUrl,
                 applicationKey: applicationKey,

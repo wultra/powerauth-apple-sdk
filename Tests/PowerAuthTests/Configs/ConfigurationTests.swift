@@ -17,13 +17,13 @@
 import XCTest
 import PowerAuth
 
-final class PowerAuthConfigurationTests: XCTestCase {
+final class ConfigurationTests: XCTestCase {
 
     let APP_KEY = String.randomBase64(dataCount: 16)
     let APP_SECRET = String.randomBase64(dataCount: 16)
     
     func testConfigurationBuilder() throws {
-        var config = try PowerAuthConfiguration.Builder(
+        var config = try Configuration.Builder(
             instanceId: "my-test",
             baseEndpointUrl: URL(string: "https://www.google.com")!,
             applicationKey: APP_KEY,
@@ -39,7 +39,7 @@ final class PowerAuthConfigurationTests: XCTestCase {
         XCTAssertNil(config.externalEncryptionKey)
         
         let EEK = Data.random(count: 16)
-        config = try PowerAuthConfiguration.Builder(
+        config = try Configuration.Builder(
             instanceId: "my-test",
             baseEndpointUrl: URL(string: "https://www.google.com")!,
             applicationKey: APP_KEY,
@@ -64,32 +64,32 @@ final class PowerAuthConfigurationTests: XCTestCase {
         let BAD_EEK = Data.random(count: 1)
         
         try [
-            PowerAuthConfiguration.Builder(
+            Configuration.Builder(
                 instanceId: "",
                 baseEndpointUrl: URL(string: "https://www.google.com")!,
                 applicationKey: APP_KEY,
                 applicationSecret: APP_SECRET,
                 masterServerPublicKey: "A+KG3cfFY/PoaH8SKeBuxiDevIkyzqj+E8AJ4Fa8JuiI"),
-            PowerAuthConfiguration.Builder(
+            Configuration.Builder(
                 instanceId: "my-test",
                 baseEndpointUrl: URL(string: "https://www.google.com")!,
                 applicationKey: APP_KEY,
                 applicationSecret: APP_SECRET,
                 masterServerPublicKey: "A+KG3cfFY/PoaH8SKeBuxiDevIkyzqj+E8AJ4Fa8JuiI")
                 .set(externalEncryptionKey: BAD_EEK),
-            PowerAuthConfiguration.Builder(
+            Configuration.Builder(
                 instanceId: "my-test",
                 baseEndpointUrl: URL(string: "https://www.google.com")!,
                 applicationKey: BAD_APP_KEY,
                 applicationSecret: APP_SECRET,
                 masterServerPublicKey: "A+KG3cfFY/PoaH8SKeBuxiDevIkyzqj+E8AJ4Fa8JuiI"),
-            PowerAuthConfiguration.Builder(
+            Configuration.Builder(
                 instanceId: "my-test",
                 baseEndpointUrl: URL(string: "https://www.google.com")!,
                 applicationKey: APP_KEY,
                 applicationSecret: BAD_APP_SECRET,
                 masterServerPublicKey: "A+KG3cfFY/PoaH8SKeBuxiDevIkyzqj+E8AJ4Fa8JuiI"),
-            PowerAuthConfiguration.Builder(
+            Configuration.Builder(
                 instanceId: "my-test",
                 baseEndpointUrl: URL(string: "https://www.google.com")!,
                 applicationKey: APP_KEY,

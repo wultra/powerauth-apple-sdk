@@ -18,30 +18,30 @@ import Foundation
 
 /// Structure representing authorization HTTP header with the PowerAuth-Authorization
 /// or PowerAuth-Token signature.
-public struct PowerAuthAuthorizationHttpHeader {
+public struct AuthorizationHttpHeader {
     
     /// Property representing PowerAuth HTTP Authorization Header. The current implementation
-    /// contains value "X-PowerAuth-Authorization" for standard authorization and "X-PowerAuth-Token"
+    /// contains value `"X-PowerAuth-Authorization"` for standard authorization and `"X-PowerAuth-Token"`
     /// for token-based authorization.
-    let name: String
+    public let headerName: String
     
     /// Computed value of the PowerAuth HTTP Authorization Header, to be used in HTTP requests "as is".
-    let value: String
+    public let headerValue: String
 }
 
-extension PowerAuthAuthorizationHttpHeader {
+extension AuthorizationHttpHeader {
     
     /// Create a new header structure created for standard authorization header.
     /// - Parameter value: Calculated header's value.
     /// - Returns: `PowerAuthAuthorizationHttpHeader` for standard PowerAuth authorization.
-    static func authorizationHeader(with value: String) -> PowerAuthAuthorizationHttpHeader {
-        PowerAuthAuthorizationHttpHeader(name: Constants.Http.authorizationHeaderName, value: value)
+    static func authorizationHeader(with value: String) -> AuthorizationHttpHeader {
+        AuthorizationHttpHeader(headerName: Constants.Http.authorizationHeaderName, headerValue: value)
     }
     
     /// Create a new header structure for toke based authorization header.
     /// - Parameter value: Calculated header's value.
     /// - Returns: `PowerAuthAuthorizationHttpHeader` for token based authorization.
-    static func tokenHeader(with value: String) -> PowerAuthAuthorizationHttpHeader {
-        PowerAuthAuthorizationHttpHeader(name: Constants.Http.tokenHeaderName, value: value)
+    static func tokenHeader(with value: String) -> AuthorizationHttpHeader {
+        AuthorizationHttpHeader(headerName: Constants.Http.tokenHeaderName, headerValue: value)
     }
 }

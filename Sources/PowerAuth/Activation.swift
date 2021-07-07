@@ -17,9 +17,9 @@
 import Foundation
 import PowerAuthCore
 
-/// The `PowerAuthActivation` structure contains activation data required for the activation creation.
+/// The `Activation` structure contains activation data required for the activation creation.
 /// The structure supports all types of activation currently supported in the SDK.
-public struct PowerAuthActivation {
+public struct Activation {
     
     /// Defines type of activation.
     public enum ActivationType {
@@ -39,7 +39,7 @@ public struct PowerAuthActivation {
     // because we cannot guarantee API stability.
     
     /// Contains parsed activation code in case this is a regular activation with activation code.
-    let activationCode: ActivationCode?
+    let activationCode: PowerAuthCore.ActivationCode?
     /// Contains identity attributes that depends on the type of the activation.
     let identityAttributes: [String:String]
     /// Contains activation name in case that the it was set in builder.
@@ -52,9 +52,9 @@ public struct PowerAuthActivation {
     let additionalActivationOtp: String?
 }
 
-public extension PowerAuthActivation {
+public extension Activation {
     
-    /// Class that builds `PowerAuthActivation` structure.
+    /// Class that builds `Activation` structure.
     class Builder {
         
         let activationType: ActivationType
@@ -71,7 +71,7 @@ public extension PowerAuthActivation {
         ///   - activationCode: Activation code, obtained either via QR code scanning or by manual entry.
         ///   - activationName: Activation name to be used for the activation.
         /// - Throws: `PowerAuthError.invalidActivationData` in case that wrong activation code is provided.
-        public init(withActivationCode activationCode: PowerAuthActivationCode, activationName: String? = nil) {
+        public init(withActivationCode activationCode: ActivationCode, activationName: String? = nil) {
             self.activationType = .activationCode
             self.identityAttributes = [ "code" : activationCode.activationCode ]
             self.activationCode = activationCode.coreActivationCode
@@ -154,11 +154,11 @@ public extension PowerAuthActivation {
             return self
         }
         
-        /// Build `PowerAuthActivation` structure from collected parameters.
+        /// Build `Activation` structure from collected parameters.
         ///
         /// - Throws: `PowerAuthError.invalidActivationData` in case that invalid combination of activation data is provided.
-        /// - Returns: `PowerAuthActivation` structure created from collected parameters.
-        public func build() throws -> PowerAuthActivation {
+        /// - Returns: `Activation` structure created from collected parameters.
+        public func build() throws -> Activation {
             if let additionalActivationOtp = additionalActivationOtp {
                 if activationType != .activationCode {
                     throw PowerAuthError.invalidActivationData(reason: .otpInWrongActivationType)
@@ -167,7 +167,7 @@ public extension PowerAuthActivation {
                     throw PowerAuthError.invalidActivationData(reason: .emptyOtp)
                 }
             }
-            return PowerAuthActivation(
+            return Activation(
                 activationType: activationType,
                 activationCode: activationCode,
                 identityAttributes: identityAttributes,

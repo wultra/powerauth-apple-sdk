@@ -18,7 +18,7 @@ public final class PowerAuth {
     
     /// Internal structure wrapping all public configuration structures.
     struct PrivateConfiguration {
-        let instance: PowerAuthConfiguration
+        let instance: Configuration
         let keychain: KeychainConfiguration
         let biometry: BiometryConfiguration
         let httpClient: HttpClientConfiguration
@@ -51,8 +51,8 @@ public final class PowerAuth {
     }
     
     
-    /// Contains `PowerAuthConfiguration` structure used to construct this `PowerAuth` instance.
-    public var configuration: PowerAuthConfiguration {
+    /// Contains `Configuration` structure used to construct this `PowerAuth` instance.
+    public var configuration: Configuration {
         conf.instance
     }
     

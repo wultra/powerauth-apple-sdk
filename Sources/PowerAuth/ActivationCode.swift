@@ -17,9 +17,9 @@
 import Foundation
 import PowerAuthCore
 
-/// The `PowerAuthActivationCode` structure contains parsed components from user-provided activation, or recovery
-/// code. You can use methods from `PowerAuthActivationCodeUtil` class to create the structure with valid data.
-public struct PowerAuthActivationCode {
+/// The `ActivationCode` structure contains parsed components from user-provided activation, or recovery
+/// code. You can use methods from `ActivationCodeValidator` class to create the structure with valid data.
+public struct ActivationCode {
     
     /// If object is constructed from an activation code, then the property contains just a code, without a signature part.
     /// If object is constructed from a recovery code, then property contains just a code, without an optional `"R:"` prefix.
@@ -37,33 +37,33 @@ public struct PowerAuthActivationCode {
     }
 }
 
-public extension PowerAuthActivationCode {
+public extension ActivationCode {
     
-    /// Parses provided activation code (which may not contain an optional signature) and returns `PowerAuthActivationCode`
+    /// Parses provided activation code (which may not contain an optional signature) and returns `ActivationCode`
     /// structure. The method doesn't perform an auto-correction, so the provided code must be valid.
     ///
     /// - Parameter activationCode: Activation code to parse.
-    /// - Returns: `PowerAuthActivationCode` structure or `nil` if provided string doesn't contain a valid activation code.
-    static func parse(fromActivationCode activationCode: String) -> PowerAuthActivationCode? {
+    /// - Returns: `ActivationCode` structure or `nil` if provided string doesn't contain a valid activation code.
+    static func parse(fromActivationCode activationCode: String) -> ActivationCode? {
         guard let parsedCode = ActivationCodeUtil.parse(fromActivationCode: activationCode) else {
             return nil
         }
-        return PowerAuthActivationCode(activationCode: parsedCode.activationCode, activationSignature: parsedCode.activationSignature)
+        return ActivationCode(activationCode: parsedCode.activationCode, activationSignature: parsedCode.activationSignature)
     }
     
-    /// Parses provided recovery code (which may contain an optional `"R:"`prefix) and returns `PowerAuthActivationCode` structure.
+    /// Parses provided recovery code (which may contain an optional `"R:"`prefix) and returns `ActivationCode` structure.
     /// The method doesn't perform an auto-correction, so the provided code must be valid.
     /// - Parameter recoveryCode: Recovery code to parse.
-    /// - Returns: `PowerAuthActivationCode` structure or `nil` if provided string doesn't contain a valid recovery code.
-    static func parse(fromRecoveryCode recoveryCode: String) -> PowerAuthActivationCode? {
+    /// - Returns: `ActivationCode` structure or `nil` if provided string doesn't contain a valid recovery code.
+    static func parse(fromRecoveryCode recoveryCode: String) -> ActivationCode? {
         guard let parsedCode = ActivationCodeUtil.parse(fromRecoveryCode: recoveryCode) else {
             return nil
         }
-        return PowerAuthActivationCode(activationCode: parsedCode.activationCode, activationSignature: parsedCode.activationSignature)
+        return ActivationCode(activationCode: parsedCode.activationCode, activationSignature: parsedCode.activationSignature)
     }
 }
 
-/// The `PowerAuthActivationCodeValidator` class provides various set of methods for validating
+/// The `ActivationCodeValidator` class provides various set of methods for validating
 /// activation or recovery codes.
 ///
 /// Current format:
@@ -85,12 +85,12 @@ public extension PowerAuthActivationCode {
 /// - Where the `'D'` is digit (0 - 9)
 ///
 /// As you can see, both activation and recovery codes, shares the same basic principle (like CRC16
-/// checksum). That's why `parse()` functions returns the same `PowerAuthActivationCode` structure
+/// checksum). That's why `parse()` functions returns the same `ActivationCode` structure
 /// for both scenarios.
 ///
 /// If you're interested in more details, then please check
 /// [our online documentation](https://developers.wultra.com/components/powerauth-crypto/1.0.x/documentation/Activation-Code).
-public final class PowerAuthActivationCodeValidator {
+public final class ActivationCodeValidator {
     
     /// Validates whether given character is a valid character allowed in the activation or recovery code.
     /// The method strictly checks whether the character is from `[A-Z2-7]` characters range.
@@ -147,10 +147,10 @@ public final class PowerAuthActivationCodeValidator {
     }
 }
 
-extension PowerAuthActivationCode {
+extension ActivationCode {
     
     /// Returns activation code in `PowerAuthCore.ActivationCode` representation.
     var coreActivationCode: PowerAuthCore.ActivationCode {
-        ActivationCode(activationCode: activationCode, activationSignature: activationSignature)
+        PowerAuthCore.ActivationCode(activationCode: activationCode, activationSignature: activationSignature)
     }
 }

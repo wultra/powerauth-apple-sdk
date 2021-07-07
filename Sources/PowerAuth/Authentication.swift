@@ -18,10 +18,10 @@ import Foundation
 import PowerAuthCore
 import LocalAuthentication
 
-/// The `PowerAuthAuthentication` structure representing multi-factor authentication object.
+/// The `Authentication` structure representing multi-factor authentication object.
 /// You must provide this object to all PowerAuth functions that calculate PowerAuth
 /// multifactor symmetric signature.
-public struct PowerAuthAuthentication {
+public struct Authentication {
     
     /// Factors involved for the signature calculation.
     public enum Factors {
@@ -49,13 +49,13 @@ public struct PowerAuthAuthentication {
 }
 
 
-public extension PowerAuthAuthentication {
+public extension Authentication {
     
-    /// Create `PowerAuthAuthentication` structure configured for possession factor only signature calculation.
+    /// Create `Authentication` structure configured for possession factor only signature calculation.
     /// - Parameter customPossessionKey: Optional possession key. If not provided, then the default possession key will be used.
-    /// - Returns: `PowerAuthAuthentication` configured for possession factor only signature calculation.
-    static func possession(customPossessionKey: Data? = nil) -> PowerAuthAuthentication {
-        PowerAuthAuthentication(
+    /// - Returns: `Authentication` configured for possession factor only signature calculation.
+    static func possession(customPossessionKey: Data? = nil) -> Authentication {
+        Authentication(
             factors: .possession,
             password: nil,
             localAuthentication: nil,
@@ -64,13 +64,13 @@ public extension PowerAuthAuthentication {
         )
     }
     
-    /// Create `PowerAuthAuthentication` structure configured for possession and biometry factors signature calculation.
+    /// Create `Authentication` structure configured for possession and biometry factors signature calculation.
     /// - Parameters:
     ///   - localAuthentication: `LAContext` for local biometric authentication.
     ///   - customPossessionKey: Optional possession key. If not provided, then the default possession key will be used.
-    /// - Returns: `PowerAuthAuthentication` configured for possession and biometry factors signature calculation.
-    static func biometryWithPossession(localAuthentication: LAContext, customPossessionKey: Data? = nil) -> PowerAuthAuthentication {
-        PowerAuthAuthentication(
+    /// - Returns: `Authentication` configured for possession and biometry factors signature calculation.
+    static func biometryWithPossession(localAuthentication: LAContext, customPossessionKey: Data? = nil) -> Authentication {
+        Authentication(
             factors: .possessionWithBiometry,
             password: nil,
             localAuthentication: localAuthentication,
@@ -79,13 +79,13 @@ public extension PowerAuthAuthentication {
         )
     }
     
-    /// Create `PowerAuthAuthentication` structure configured for possession and biometry factors signature calculation.
+    /// Create `Authentication` structure configured for possession and biometry factors signature calculation.
     /// - Parameters:
     ///   - customBiometryKey: Custom biometry key.
     ///   - customPossessionKey: Optional possession key. If not provided, then the default possession key will be used.
-    /// - Returns: `PowerAuthAuthentication` configured for possession and biometry factors signature calculation.
-    static func biometryWithPossession(customBiometryKey: Data, customPossessionKey: Data? = nil) -> PowerAuthAuthentication {
-        PowerAuthAuthentication(
+    /// - Returns: `Authentication` configured for possession and biometry factors signature calculation.
+    static func biometryWithPossession(customBiometryKey: Data, customPossessionKey: Data? = nil) -> Authentication {
+        Authentication(
             factors: .possessionWithBiometry,
             password: nil,
             localAuthentication: nil,
@@ -94,13 +94,13 @@ public extension PowerAuthAuthentication {
         )
     }
     
-    /// Create `PowerAuthAuthentication` structure configured for possession and knowledge factors signature calculation.
+    /// Create `Authentication` structure configured for possession and knowledge factors signature calculation.
     /// - Parameters:
     ///   - password: String with user's password.
     ///   - customPossessionKey: Optional possession key. If not provided, then the default possession key will be used.
-    /// - Returns: `PowerAuthAuthentication` configured for possession and knowledge factors signature calculation.
-    static func knowledgeWithPossession(password: String, customPossessionKey: Data? = nil) -> PowerAuthAuthentication {
-        PowerAuthAuthentication(
+    /// - Returns: `Authentication` configured for possession and knowledge factors signature calculation.
+    static func knowledgeWithPossession(password: String, customPossessionKey: Data? = nil) -> Authentication {
+        Authentication(
             factors: .possessionWithKnowledge,
             password: Password(string: password),
             localAuthentication: nil,
@@ -109,13 +109,13 @@ public extension PowerAuthAuthentication {
         )
     }
     
-    /// Create `PowerAuthAuthentication` structure configured for possession and knowledge factors signature calculation.
+    /// Create `Authentication` structure configured for possession and knowledge factors signature calculation.
     /// - Parameters:
     ///   - password: `PowerAuthCore.Password` object with user's password.
     ///   - customPossessionKey: Optional possession key. If not provided, then the default possession key will be used.
-    /// - Returns: `PowerAuthAuthentication` configured for possession and knowledge factors signature calculation.
-    static func knowledgeWithPossession(password: Password, customPossessionKey: Data? = nil) -> PowerAuthAuthentication {
-        PowerAuthAuthentication(
+    /// - Returns: `Authentication` configured for possession and knowledge factors signature calculation.
+    static func knowledgeWithPossession(password: Password, customPossessionKey: Data? = nil) -> Authentication {
+        Authentication(
             factors: .possessionWithKnowledge,
             password: password,
             localAuthentication: nil,
@@ -125,13 +125,13 @@ public extension PowerAuthAuthentication {
     }
 }
 
-extension PowerAuthAuthentication {
+extension Authentication {
     
     /// Internal function that create `PowerAuthCore.SignatureFactorkKeys` object created from this structure data.
     /// - Parameter dataProvider: `DataProvider` that provide factor keys.
     /// - Throws: `PowerAuthError.internalError` in case that unhandled combination of factor and associated data is detected.
     /// - Returns: `PowerAuthCore.SignatureFactorkKeys` object created from this structure data.
-    func getSignatureFactorKeys(with dataProvider: DataProvider) throws -> SignatureFactorkKeys {
+    func getSignatureFactorKeys(with dataProvider: DataProvider) throws -> PowerAuthCore.SignatureFactorkKeys {
         let possessionKey = try customPossessionKey ?? dataProvider.possessionFactorEncryptionKey()
         switch factors {
             case .possession:

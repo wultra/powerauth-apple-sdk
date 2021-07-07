@@ -16,9 +16,9 @@
 
 import Foundation
 
-/// The `PowerAuthActivationResult` structure represents successfull result
+/// The `ActivationResult` structure represents successfull result
 /// from the activation process.
-public struct PowerAuthActivationResult {
+public struct ActivationResult {
     
     /// Decimalized fingerprint calculated from device's and server's public keys.
     public let activationFingerprint: String
@@ -26,7 +26,7 @@ public struct PowerAuthActivationResult {
     /// If supported and enabled on the server, then the object contains "Recovery Code" and PUK,
     /// created for this particular activation. Your application should display that values to the user
     /// and forget the values immediately. You should NEVER store values from the object persistently on the device.
-    public let activationRecovery: PowerAuthActivationRecoveryData?
+    public let activationRecovery: ActivationRecoveryData?
     
     /// Custom attributes received from the server. The value may be `nil` in case that there
     /// are no custom attributes available.

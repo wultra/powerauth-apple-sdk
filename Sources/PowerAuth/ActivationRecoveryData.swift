@@ -16,9 +16,9 @@
 
 import Foundation
 
-/// The `PowerAuthActivationRecoveryData` structure contains information
+/// The `ActivationRecoveryData` structure contains information
 /// about recovery code and PUK, created during the activation process.
-public struct PowerAuthActivationRecoveryData {
+public struct ActivationRecoveryData {
     
     /// Contains recovery code.
     public let recoveryCode: String

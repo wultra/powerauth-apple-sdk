@@ -25,7 +25,7 @@ final class PowerAuthBuilderTests: XCTestCase {
     
     func testInstanceBuilder() throws {
         // Prepare various configs
-        let instanceConfig = try PowerAuthConfiguration.Builder(
+        let instanceConfig = try Configuration.Builder(
             instanceId: "instance-id",
             baseEndpointUrl: URL(string: "https://google.com")!,
             applicationKey: APP_KEY,
@@ -76,8 +76,8 @@ extension BiometryConfiguration: Equatable {
     }
 }
 
-extension PowerAuthConfiguration: Equatable {
-    public static func == (lhs: PowerAuthConfiguration, rhs: PowerAuthConfiguration) -> Bool {
+extension Configuration: Equatable {
+    public static func == (lhs: Configuration, rhs: Configuration) -> Bool {
         lhs.instanceId == rhs.instanceId &&
         lhs.applicationKey == rhs.applicationKey &&
         lhs.applicationSecret == rhs.applicationSecret &&
