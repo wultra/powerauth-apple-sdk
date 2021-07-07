@@ -23,7 +23,7 @@ public enum PowerAuthError: Error {
     
     /// The underlying reason the `.invalidConfiguration` error occured.
     public enum ConfigurationFailureReason {
-        /// `Configuration` contains missing or invalid data.
+        /// `PowerAuthConfiguration` contains missing or invalid data.
         case invalidConfiguration
         
         /// `KeychainConfiguration` contains missing or invalid data.

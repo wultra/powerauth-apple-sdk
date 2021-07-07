@@ -19,9 +19,9 @@ import Foundation
 enum Constants {
     
     enum KeySizes {
-        /// Expected length of data encoded in `Configuration.applicationKey` paramterer
+        /// Expected length of data encoded in `PowerAuthConfiguration.applicationKey` paramterer
         static let APP_KEY_SIZE = 16
-        /// Expected length of data encoded in `Configuration.applicationSecret` paramterer
+        /// Expected length of data encoded in `PowerAuthConfiguration.applicationSecret` paramterer
         static let APP_SECRET_SIZE = 16
         /// External encryption key's size.
         static let EEK_SIZE = 16
@@ -49,6 +49,8 @@ enum Constants {
     enum Http {
         /// Defines default connection timeout used by internal HTTP client.
         static let defaultConnectionTimeout: TimeInterval = 20.0
+        /// Defines minimum connection timeout accepted in `HttpClientConfiguration` structure
+        static let minimumConnectionTimeout: TimeInterval = 1.0
         
         /// Constant for PowerAuth authorization header name.
         static let authorizationHeaderName = "X-PowerAuth-Authorization"

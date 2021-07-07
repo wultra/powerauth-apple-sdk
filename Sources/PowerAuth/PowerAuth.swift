@@ -16,16 +16,8 @@
 
 public final class PowerAuth {
     
-    /// Internal structure wrapping all public configuration structures.
-    struct PrivateConfiguration {
-        let instance: Configuration
-        let keychain: KeychainConfiguration
-        let biometry: BiometryConfiguration
-        let httpClient: HttpClientConfiguration
-    }
-    
-    /// Configurations
-    let conf: PrivateConfiguration
+    /// Contains `PowerAuthConfiguration` structure used to construct this `PowerAuth` instance.
+    public let configuration: PowerAuthConfiguration
     
     /// Data provider instance.
     let dataProvider: DataProvider
@@ -34,40 +26,25 @@ public final class PowerAuth {
     let httpClient: HttpClient
     
     /// Initialize `PowerAuth` class instance with all required configuration objects.
-    /// The constructor is internal, so you have to use `PowerAuth.Builder` class to
-    /// create an instance of `PowerAuth` class.
+    /// The constructor is internal and available only for testing purposes.
     /// 
     /// - Parameters:
-    ///   - configuration: Structure wrapping all configuration structures.
+    ///   - configuration: `PowerAuthConfiguration` structure
     ///   - dataProvider: `DataProvider` implementation
     ///   - httpClient: `HttpClient` implementation
     init(
-        configuration: PrivateConfiguration,
+        configuration: PowerAuthConfiguration,
         dataProvider: DataProvider,
         httpClient: HttpClient) {
-        self.conf = configuration
+        self.configuration = configuration
         self.dataProvider = dataProvider
         self.httpClient = httpClient
     }
     
-    
-    /// Contains `Configuration` structure used to construct this `PowerAuth` instance.
-    public var configuration: Configuration {
-        conf.instance
-    }
-    
-    /// Contains `KeychainConfiguration` structure used to construct this `PowerAuth` instance.
-    public var keychainConfiguration: KeychainConfiguration {
-        conf.keychain
-    }
-    
-    /// Contains `BiometryConfiguration` structure used to construct this `PowerAuth` instance.
-    public var biometryConfiguration: BiometryConfiguration {
-        conf.biometry
-    }
-    
-    /// Contains `HttpClientConfiguration` structure used to construct this `PowerAuth` instance.
-    public var httpClientConfiguration: HttpClientConfiguration {
-        conf.httpClient
+    /// Construct `PowerAuth` class instance with provided `PowerAuthConfiguration` structure.
+    /// - Parameter configuration: `PowerAuthConfiguration` structure.
+    /// - Throws: `PowerAuthError.invalidConfiguration` in case of failure
+    public convenience init(configuration: PowerAuthConfiguration) throws {
+        self.init(configuration: configuration, dataProvider: try DefaultDataProvider(with: configuration), httpClient: DefaultHttpClient(with: configuration.httpClient))
     }
 }

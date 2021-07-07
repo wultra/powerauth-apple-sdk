@@ -18,9 +18,9 @@ import Foundation
 
 class DefaultHttpClient: HttpClient {
     
-    let configuration: HttpClientConfiguration
+    let configuration: PowerAuthConfiguration.HttpClient
     
-    init(with configuration: HttpClientConfiguration) {
+    init(with configuration: PowerAuthConfiguration.HttpClient) {
         self.configuration = configuration
     }
 }

@@ -28,10 +28,10 @@ class KeychainFactory {
     private static var userDefaultsSuiteName: String?
     
     /// Get `PowerAuthKeychainFactory` configured to cleanup all future produced keychains
-    /// - Parameter configuration: `KeychainConfiguration`
+    /// - Parameter configuration: `PowerAuthConfiguration.Keychains`
     /// - Throws: `PowerAuthError.invalidConfiguration` in case you alter `userDefaultsSuiteName` during the factory lifetime.
     /// - Returns: Singleton instance of `PowerAuthKeychainFactory`
-    static func factory(for configuration: KeychainConfiguration) throws -> PowerAuthKeychainFactory {
+    static func factory(for configuration: PowerAuthConfiguration.Keychains) throws -> PowerAuthKeychainFactory {
         return try lock.synchronized {
             // Validate `userDefaultsSuiteName` across all used configurations
             if hasUserDefaultsSuiteName {

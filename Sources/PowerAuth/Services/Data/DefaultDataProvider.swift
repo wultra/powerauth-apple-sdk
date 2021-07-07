@@ -29,17 +29,17 @@ class DefaultDataProvider: DataProvider {
     let keychainItemAccessForBiometryFactor: PowerAuthKeychainItemAccess
     
     /// Initialize default data provider with provided `KeychainConfiguration`.
-    /// - Parameter configuration: `KeychainConfiguration` structure
+    /// - Parameter configuration: `PowerAuthConfiguration` structure
     /// - Throws:
     ///   - `PowerAuthError.invalidConfiguration` in case that `KeychainConfiguration` contains invalid configuration. Check debug log for more details.
     ///   - `PowerAuthError.unexpectedFailure` in case that other type of error occured.
-    init(with configuration: PowerAuth.PrivateConfiguration) throws {
+    init(with configuration: PowerAuthConfiguration) throws {
         do {
-            let keychainConfiguration = configuration.keychain
-            let accessGroup = configuration.keychain.accessGroupName
+            let keychainConfiguration = configuration.keychains
+            let accessGroup = configuration.keychains.accessGroupName
             let factory = try KeychainFactory.factory(for: keychainConfiguration)
             // Keys & Identifiers
-            self.instanceIdentifier = configuration.instance.instanceId
+            self.instanceIdentifier = configuration.instanceId
             self.keychainKeyForPossesionFactor = configuration.keychainKeyForPossesionFactor
             self.keychainKeyForBiometryFactor = configuration.keychainKeyForBiometryFactor
             self.keychainItemAccessForBiometryFactor = configuration.biometry.keychainItemAccessProtection
@@ -120,13 +120,13 @@ class DefaultDataProvider: DataProvider {
 }
 
 
-extension BiometryConfiguration {
+extension PowerAuthConfiguration.Biometry {
     
     /// Determine `PowerAuthKeychainItemAccess` protection from the biometric configuration
     var keychainItemAccessProtection: PowerAuthKeychainItemAccess {
-        if allowBiometricAuthenticationFallbackToDevicePasscode {
+        if fallbackToDevicePasscode {
             return .anyBiometricSetOrDevicePasscode
-        } else if linkBiometricItemsToCurrentSet {
+        } else if linkItemsToCurrentSet {
             return .currentBiometricSet
         } else {
             return .anyBiometricSet
