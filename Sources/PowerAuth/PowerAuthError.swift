@@ -24,7 +24,7 @@ public enum PowerAuthError: Error {
     /// The underlying reason the `.invalidConfiguration` error occured.
     public enum ConfigurationFailureReason {
         /// `PowerAuthConfiguration` contains missing or invalid data.
-        case invalidConfiguration
+        case invalidInstanceConfiguration
         
         /// `KeychainConfiguration` contains missing or invalid data.
         case invalidKeychainConfiguration
@@ -42,8 +42,6 @@ public enum PowerAuthError: Error {
     /// The operation was requested in wrong `PowerAuth` activation state.
     case invalidActivationState
     
-    /// The operation require a valid `PowerAuth` activation.
-    case missingActivation
     
     // Activation
     
@@ -65,6 +63,25 @@ public enum PowerAuthError: Error {
     
     /// Data provided to `Activation` structure are invalid.
     case invalidActivationData(reason: ActivationDataFailureReason)
+    
+    
+    // Authentication
+    
+    /// The underlying reason the `.invalidAuthenticationData` error occured.
+    public enum AuthenticationDataFailureReason {
+        /// `Authentication` structure you have provided is created for data signing instead for activation commit.
+        case authenticationForCommitIsRequired
+        /// `Authentication` structure you have provided is created for activation signing instead for data signing.
+        case authenticationForSigningIsRequired
+        /// `Authentication` doesn't contain `LAContext` object or custom biometric key.
+        case localAuthenticationContextIsMissing
+        /// `Authentication` structure contains too short password.
+        case passwordIsTooShort
+    }
+    
+    /// Data provided to `Authentication` structure are invalid
+    case invalidAuthenticationData(reason: AuthenticationDataFailureReason)
+    
     
     // Biometry
     
@@ -136,16 +153,7 @@ public extension PowerAuthError {
                 return nil
         }
     }
-    
-    /// Wrap any error to `PowerAuthError`. If given error is already `PowerAuthError` instance then returns this instance,
-    /// otherwise `.unexpectedError` is returned.
-    /// - Parameter error: Error object to wrap into `PowerAuthError`
-    /// - Returns: The same instance if `error` is already instance of `PowerAuthError`, or `.unexpectedError`
-    internal static func wrap(_ error: Error) -> PowerAuthError {
-        error.asPowerAuthError(or: .unexpectedFailure(reason: error))
-    }
 }
-
 
 public extension Error {
     /// Returns the instance cast as a `PowerAuthError`

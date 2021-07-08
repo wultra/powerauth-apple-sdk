@@ -27,6 +27,8 @@ enum Constants {
         static let EEK_SIZE = 16
         /// Size of stored possession or biometry factor key.
         static let SIGNATURE_FACTOR_KEY_SIZE = 16
+        /// Minimum length of password
+        static let MIN_PASSWORD_LENGTH = 4
     }
     
     enum KeychainNames {

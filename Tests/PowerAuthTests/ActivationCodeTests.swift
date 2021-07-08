@@ -17,7 +17,7 @@
 import XCTest
 import PowerAuth
 
-final class ActicationCodeTests: XCTestCase {
+final class ActicationCodeTests: BaseTestCase {
     
     // MARK: Activation code
     

@@ -14,16 +14,30 @@
 // and limitations under the License.
 //
 
+import Foundation
+import PowerAuthCore
+import PowerAuthShared
+
 public final class PowerAuth {
     
     /// Contains `PowerAuthConfiguration` structure used to construct this `PowerAuth` instance.
     public let configuration: PowerAuthConfiguration
+        
+    /// Internal `PowerAuthCore.Session` object.
+    let session: PowerAuthCore.Session
     
     /// Data provider instance.
     let dataProvider: DataProvider
     
     /// HTTP client instance.
     let httpClient: HttpClient
+    
+    /// Thread synchronization primitive.
+    let lock: Lock = Lock()
+    
+    /// Contains last fetched activation status.
+    /// Use `lastFetchedActivationStatus` to access it internally.
+    var lastActivationStatus: ActivationStatus?
     
     /// Initialize `PowerAuth` class instance with all required configuration objects.
     /// The constructor is internal and available only for testing purposes.
@@ -32,19 +46,50 @@ public final class PowerAuth {
     ///   - configuration: `PowerAuthConfiguration` structure
     ///   - dataProvider: `DataProvider` implementation
     ///   - httpClient: `HttpClient` implementation
-    init(
+    /// - Throws:
+    ///   - `PowerAuthError.invalidConfiguration` in case that some configuration parameter is invalid.
+    ///   - `PowerAuthError` for all othher failures.
+    internal init(
         configuration: PowerAuthConfiguration,
         dataProvider: DataProvider,
-        httpClient: HttpClient) {
+        httpClient: HttpClient) throws {
+        self.session = Session(setup: configuration.powerAuthCoreSessionSetup)
         self.configuration = configuration
         self.dataProvider = dataProvider
         self.httpClient = httpClient
+        
+        try restoreSessionState()
     }
     
     /// Construct `PowerAuth` class instance with provided `PowerAuthConfiguration` structure.
     /// - Parameter configuration: `PowerAuthConfiguration` structure.
-    /// - Throws: `PowerAuthError.invalidConfiguration` in case of failure
+    /// - Throws:
+    ///   - `PowerAuthError.invalidConfiguration` in case that some configuration parameter is invalid.
+    ///   - `PowerAuthError` for all othher failures.
     public convenience init(configuration: PowerAuthConfiguration) throws {
-        self.init(configuration: configuration, dataProvider: try DefaultDataProvider(with: configuration), httpClient: DefaultHttpClient(with: configuration.httpClient))
+        try self.init(
+            configuration: configuration,
+            dataProvider: try DefaultDataProvider(with: configuration),
+            httpClient: DefaultHttpClient(with: configuration.httpClient)
+        )
+    }
+    
+    /// Restore internal Session's state.
+    /// - Throws:
+    func restoreSessionState() throws {
+        guard session.hasValidSetup else {
+            D.error("PowerAuthCore.Session has invalid setup.")
+            throw PowerAuthError.invalidConfiguration(reason: .invalidInstanceConfiguration)
+        }
+        do {
+            if let stateData = try dataProvider.activationState() {
+                D.print("Loading initial session state for PowerAuth instance.")
+                try session.deserialize(state: stateData)
+            } else {
+                D.print("There's no initial session state for PowerAuth instance.")
+            }
+        } catch {
+            throw PowerAuthError.wrap(error)
+        }
     }
 }

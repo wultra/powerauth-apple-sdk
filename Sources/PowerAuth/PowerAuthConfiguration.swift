@@ -15,6 +15,7 @@
 //
 
 import Foundation
+import PowerAuthCore
 
 /// Structure that represents `PowerAuth` configuration.
 public struct PowerAuthConfiguration {
@@ -95,30 +96,30 @@ public struct PowerAuthConfiguration {
     /// - Throws: `PowerAuthError.invalidConfiguration` in case that some parameter is invalid.
     private func validate() throws {
         guard !instanceId.isEmpty else {
-            D.error("PowerAuth.Configuration contains empty 'instanceId' parameter")
-            throw PowerAuthError.invalidConfiguration(reason: .invalidConfiguration)
+            D.error("PowerAuthConfiguration contains empty 'instanceId' parameter")
+            throw PowerAuthError.invalidConfiguration(reason: .invalidInstanceConfiguration)
         }
         guard InputValidator.validate(base64String: applicationKey, expectedCount: Constants.KeySizes.APP_KEY_SIZE) else {
-            D.error("PowerAuth.Configuration has invalid 'applicationKey' parameter")
-            throw PowerAuthError.invalidConfiguration(reason: .invalidConfiguration)
+            D.error("PowerAuthConfiguration has invalid 'applicationKey' parameter")
+            throw PowerAuthError.invalidConfiguration(reason: .invalidInstanceConfiguration)
         }
         guard InputValidator.validate(base64String: applicationSecret, expectedCount: Constants.KeySizes.APP_SECRET_SIZE) else {
-            D.error("PowerAuth.Configuration has invalid 'applicationSecret' parameter")
-            throw PowerAuthError.invalidConfiguration(reason: .invalidConfiguration)
+            D.error("PowerAuthConfiguration has invalid 'applicationSecret' parameter")
+            throw PowerAuthError.invalidConfiguration(reason: .invalidInstanceConfiguration)
         }
         guard InputValidator.validate(base64String: masterServerPublicKey, min: 30, max: nil) else {
-            D.error("PowerAuth.Configuration has invalid 'masterServerPublicKey' parameter")
-            throw PowerAuthError.invalidConfiguration(reason: .invalidConfiguration)
+            D.error("PowerAuthConfiguration has invalid 'masterServerPublicKey' parameter")
+            throw PowerAuthError.invalidConfiguration(reason: .invalidInstanceConfiguration)
         }
         if let eek = externalEncryptionKey {
             guard eek.count == Constants.KeySizes.EEK_SIZE else {
-                D.error("PowerAuth.Configuration has invalid 'externalEncryptionKey' parameter")
-                throw PowerAuthError.invalidConfiguration(reason: .invalidConfiguration)
+                D.error("PowerAuthConfiguration has invalid 'externalEncryptionKey' parameter")
+                throw PowerAuthError.invalidConfiguration(reason: .invalidInstanceConfiguration)
             }
         }
     }
     
-    // MARK: - HttpClient -
+    // MARK: - HttpClient
     
     /// Structure that is used to provide RESTful API client configuration.
     public struct HttpClient {
@@ -160,13 +161,13 @@ public struct PowerAuthConfiguration {
         /// - Throws: `PowerAuthError.invalidConfiguration` in case that request timeout is too short.
         fileprivate func validate() throws {
             guard requestTimeout >= Constants.Http.minimumConnectionTimeout else {
-                D.error("HttpClientConfiguration contains too short request timeout.")
+                D.error("PowerAuthConfiguration.HttpClient contains too short request timeout.")
                 throw PowerAuthError.invalidConfiguration(reason: .invalidHttpClientConfiguration)
             }
         }
     }
     
-    // MARK: - Keychains -
+    // MARK: - Keychains
     
     /// Structure that is used to provide Keychain storage configuration.
     public struct Keychains {
@@ -250,42 +251,42 @@ public struct PowerAuthConfiguration {
         /// - Throws: `PowerAuthError.invalidConfiguration` in case of failure.
         private func validate() throws {
             guard !(accessGroupName?.isEmpty ?? false) else {
-                D.error("KeychainConfiguration has empty 'accessGroupName' parameter.")
+                D.error("PowerAuthConfiguration.Keychains has empty 'accessGroupName' parameter.")
                 throw PowerAuthError.invalidConfiguration(reason: .invalidKeychainConfiguration)
             }
             guard !(userDefaultsSuiteName?.isEmpty ?? false) else {
-                D.error("KeychainConfiguration has empty 'userDefaultsSuiteName' parameter.")
+                D.error("PowerAuthConfiguration.Keychains has empty 'userDefaultsSuiteName' parameter.")
                 throw PowerAuthError.invalidConfiguration(reason: .invalidKeychainConfiguration)
             }
             guard !statusKeychainName.isEmpty else {
-                D.error("KeychainConfiguration has empty 'statusKeychainName' parameter.")
+                D.error("PowerAuthConfiguration.Keychains has empty 'statusKeychainName' parameter.")
                 throw PowerAuthError.invalidConfiguration(reason: .invalidKeychainConfiguration)
             }
             guard !possessionKeychainName.isEmpty else {
-                D.error("KeychainConfiguration has empty 'possessionKeychainName' parameter.")
+                D.error("PowerAuthConfiguration.Keychains has empty 'possessionKeychainName' parameter.")
                 throw PowerAuthError.invalidConfiguration(reason: .invalidKeychainConfiguration)
             }
             guard !biometryKeychainName.isEmpty else {
-                D.error("KeychainConfiguration has empty 'biometryKeychainName' parameter.")
+                D.error("PowerAuthConfiguration.Keychains has empty 'biometryKeychainName' parameter.")
                 throw PowerAuthError.invalidConfiguration(reason: .invalidKeychainConfiguration)
             }
             guard !tokenStoreKeychainName.isEmpty else {
-                D.error("KeychainConfiguration has empty 'tokenStoreKeychainName' parameter.")
+                D.error("PowerAuthConfiguration.Keychains has empty 'tokenStoreKeychainName' parameter.")
                 throw PowerAuthError.invalidConfiguration(reason: .invalidKeychainConfiguration)
             }
             guard !possessionKeyName.isEmpty else {
-                D.error("KeychainConfiguration has empty 'possessionKeyName' parameter.")
+                D.error("PowerAuthConfiguration.Keychains has empty 'possessionKeyName' parameter.")
                 throw PowerAuthError.invalidConfiguration(reason: .invalidKeychainConfiguration)
             }
             guard !(biometryKeyName?.isEmpty ?? false) else {
-                D.error("KeychainConfiguration has empty 'biometryKeyName' parameter.")
+                D.error("PowerAuthConfiguration.Keychains has empty 'biometryKeyName' parameter.")
                 throw PowerAuthError.invalidConfiguration(reason: .invalidKeychainConfiguration)
             }
             let keychainNames = [ possessionKeychainName, statusKeychainName, biometryKeychainName, tokenStoreKeychainName ]
             for i in 0..<keychainNames.count {
                 for j in 0..<keychainNames.count {
                     if i != j && keychainNames[i] == keychainNames[j] {
-                        D.error("Keychain names in KeychainConfiguration must be unique.")
+                        D.error("Keychain names in PowerAuthConfiguration.Keychains must be unique.")
                         throw PowerAuthError.invalidConfiguration(reason: .invalidKeychainConfiguration)
                     }
                 }
@@ -377,6 +378,7 @@ public protocol HttpRequestInterceptor {
 // MARK: - Internals
 
 extension PowerAuthConfiguration {
+    
     /// Contains key to biometry keychain to obtain value for biometry factor related key.
     var keychainKeyForBiometryFactor: String {
         keychains.biometryKeyName ?? instanceId
@@ -385,5 +387,15 @@ extension PowerAuthConfiguration {
     /// Contains key to posssession keychain to obtain value for possession factor related key.
     var keychainKeyForPossesionFactor: String {
         keychains.possessionKeyName
+    }
+    
+    /// Contains `PowerAuthCore.SessionSetup` configuration created from the configuration.
+    var powerAuthCoreSessionSetup: PowerAuthCore.SessionSetup {
+        SessionSetup(
+            applicationKey: applicationKey,
+            applicationSecret: applicationSecret,
+            masterServerPublicKey: masterServerPublicKey,
+            externalEncryptionKey: externalEncryptionKey
+        )
     }
 }

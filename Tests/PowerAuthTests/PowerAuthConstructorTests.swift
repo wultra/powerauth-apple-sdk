@@ -17,7 +17,7 @@
 import XCTest
 @testable import PowerAuth
 
-final class PowerAuthConstructorTests: XCTestCase {
+final class PowerAuthConstructorTests: BaseTestCase {
 
     let APP_KEY = String.randomBase64(dataCount: 16)
     let APP_SECRET = String.randomBase64(dataCount: 16)
@@ -36,7 +36,7 @@ final class PowerAuthConstructorTests: XCTestCase {
         let httpClientConfig = try PowerAuthConfiguration.HttpClient(requestTimeout: 10, tlsValidationStrategy: .noValidation, requestInterceptors: [PowerAuthConfigurationTests.Interceptor1()])
         
         // Now build PowerAuth class
-        var powerAuth = try PowerAuth(configuration: instanceConfig)
+        var powerAuth = try PowerAuth(configuration: instanceConfig, dataProvider: FakeDataProvider(), httpClient: FakeHttpClient())
         XCTAssertEqual(instanceConfig, powerAuth.configuration)
         XCTAssertEqual(PowerAuthConfiguration.Biometry.default, powerAuth.configuration.biometry)
         XCTAssertEqual(PowerAuthConfiguration.HttpClient.default, powerAuth.configuration.httpClient)
@@ -54,7 +54,9 @@ final class PowerAuthConstructorTests: XCTestCase {
                                     masterServerPublicKey: instanceConfig.masterServerPublicKey,
                                     keychainsConfiguration: keychainConfig,
                                     httpClientConfiguration: httpClientConfig,
-                                    biometryConfiguration: biometryConfig))
+                                    biometryConfiguration: biometryConfig),
+                                  dataProvider: FakeDataProvider(),
+                                  httpClient: FakeHttpClient())
         XCTAssertEqual(powerAuth.configuration.instanceId, instanceConfig.instanceId)
         XCTAssertEqual(powerAuth.configuration.baseEndpointUrl, instanceConfig.baseEndpointUrl)
         XCTAssertEqual(powerAuth.configuration.applicationKey, instanceConfig.applicationKey)

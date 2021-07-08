@@ -17,7 +17,7 @@
 import XCTest
 @testable import PowerAuth
 
-final class ActicationTests: XCTestCase {
+final class ActicationTests: BaseTestCase {
     
     // MARK: - Regular
     

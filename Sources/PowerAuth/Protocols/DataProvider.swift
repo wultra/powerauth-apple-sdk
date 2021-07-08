@@ -50,7 +50,8 @@ protocol DataProvider {
     func hasBiometryFactorEncryptionKey() -> Bool
     
     /// Function returns biometry factor encryption key. If key is not stored or accessible, then throws error.
-    /// - Parameter authentication: Local authentication object to acquire key from underlying keychain.
+    /// - Parameters:
+    ///   - authentication: Local authentication object to acquire key from underlying keychain.
     /// - Returns: Biometry factor encryption key.
     /// - Throws: `PowerAuthError` in case of failure.
     func biometryFactorEncryptionKey(authentication: LAContext) throws -> Data

@@ -19,12 +19,72 @@ import PowerAuthCore
 import LocalAuthentication
 @testable import PowerAuth
 
-final class AuthenticationTests: XCTestCase {
+final class AuthenticationTests: BaseTestCase {
     
     let dataProvider = FakeDataProvider(possessionKey: Data.random(count: 16), biometryKey: Data.random(count: 16))
     
     let customPossessionKey = Data.random(count: 16)
     let customBiometryKey = Data.random(count: 16)
+    
+    func testCommitWithKnowledge() throws {
+        let auth1 = Authentication.commitWithKnowledge(password: "NBUSR123")
+        let keys1 = try auth1.getSignatureFactorKeys(with: dataProvider)
+        XCTAssertEqual(.commitWithKnowledge, auth1.factors)
+        XCTAssertEqual(dataProvider.possessionKey, keys1.possessionKey)
+        XCTAssertNil(keys1.biometryKey)
+        XCTAssertTrue(keys1.password?.isEqual(to: Password(string: "NBUSR123")) ?? false)
+
+        let auth2 = Authentication.commitWithKnowledge(password: Password(string: "NBUSR123"), customPossessionKey: customPossessionKey)
+        let keys2 = try auth2.getSignatureFactorKeys(with: dataProvider)
+        XCTAssertEqual(.commitWithKnowledge, auth2.factors)
+        XCTAssertEqual(customPossessionKey, keys2.possessionKey)
+        XCTAssertNil(keys2.biometryKey)
+        XCTAssertTrue(keys2.password?.isEqual(to: Password(string: "NBUSR123")) ?? false)
+        
+        let auth3 = Authentication.commitWithKnowledge(password: "NBUSR123", customPossessionKey: customPossessionKey)
+        let keys3 = try auth3.getSignatureFactorKeys(with: dataProvider)
+        XCTAssertEqual(.commitWithKnowledge, auth3.factors)
+        XCTAssertEqual(customPossessionKey, keys3.possessionKey)
+        XCTAssertNil(keys3.biometryKey)
+        XCTAssertTrue(keys3.password?.isEqual(to: Password(string: "NBUSR123")) ?? false)
+    }
+    
+    func testCommitWithKnowledgeAndBiometry() throws {
+        let auth1 = Authentication.commitWithKnowledgeAndBiometry(password: "NBUSR123")
+        let keys1 = try auth1.getSignatureFactorKeys(with: dataProvider)
+        XCTAssertEqual(.commitWithKnowledgeAndBiometry, auth1.factors)
+        XCTAssertEqual(dataProvider.possessionKey, keys1.possessionKey)
+        XCTAssertNotNil(keys1.biometryKey) // random key, cannot be evaluated
+        XCTAssertTrue(keys1.password?.isEqual(to: Password(string: "NBUSR123")) ?? false)
+        
+        let auth2 = Authentication.commitWithKnowledgeAndBiometry(password: Password(string: "NBUSR123"))
+        let keys2 = try auth2.getSignatureFactorKeys(with: dataProvider)
+        XCTAssertEqual(.commitWithKnowledgeAndBiometry, auth2.factors)
+        XCTAssertEqual(dataProvider.possessionKey, keys2.possessionKey)
+        XCTAssertNotNil(keys2.biometryKey) // random key, cannot be evaluated
+        XCTAssertTrue(keys2.password?.isEqual(to: Password(string: "NBUSR123")) ?? false)
+        
+        let auth3 = Authentication.commitWithKnowledgeAndBiometry(password: Password(string: "NBUSR123"), customPossessionKey: customPossessionKey)
+        let keys3 = try auth3.getSignatureFactorKeys(with: dataProvider)
+        XCTAssertEqual(.commitWithKnowledgeAndBiometry, auth3.factors)
+        XCTAssertEqual(customPossessionKey, keys3.possessionKey)
+        XCTAssertNotNil(keys3.biometryKey) // random key, cannot be evaluated
+        XCTAssertTrue(keys3.password?.isEqual(to: Password(string: "NBUSR123")) ?? false)
+        
+        let auth4 = Authentication.commitWithKnowledgeAndBiometry(password: Password(string: "NBUSR123"), customBiometryKey: customBiometryKey, customPossessionKey: customPossessionKey)
+        let keys4 = try auth4.getSignatureFactorKeys(with: dataProvider)
+        XCTAssertEqual(.commitWithKnowledgeAndBiometry, auth4.factors)
+        XCTAssertEqual(customPossessionKey, keys4.possessionKey)
+        XCTAssertEqual(customBiometryKey, keys4.biometryKey)
+        XCTAssertTrue(keys4.password?.isEqual(to: Password(string: "NBUSR123")) ?? false)
+        
+        let auth5 = Authentication.commitWithKnowledgeAndBiometry(password: Password(string: "NBUSR123"), customBiometryKey: customBiometryKey)
+        let keys5 = try auth5.getSignatureFactorKeys(with: dataProvider)
+        XCTAssertEqual(.commitWithKnowledgeAndBiometry, auth5.factors)
+        XCTAssertEqual(dataProvider.possessionKey, keys5.possessionKey)
+        XCTAssertEqual(customBiometryKey, keys5.biometryKey)
+        XCTAssertTrue(keys5.password?.isEqual(to: Password(string: "NBUSR123")) ?? false)
+    }
     
     func testPossessionFactor() throws {
         let auth1 = Authentication.possession()
@@ -93,5 +153,13 @@ final class AuthenticationTests: XCTestCase {
         } catch PowerAuthError.biometricAuthenticationFailed(let reason) {
             XCTAssertEqual(.notConfigured, reason)
         }
+    }
+    
+    func testFactorVsCommitFlag() throws {
+        XCTAssertTrue(Authentication.Factors.commitWithKnowledge.isFactorsForActivationCommit)
+        XCTAssertTrue(Authentication.Factors.commitWithKnowledgeAndBiometry.isFactorsForActivationCommit)
+        XCTAssertFalse(Authentication.Factors.possession.isFactorsForActivationCommit)
+        XCTAssertFalse(Authentication.Factors.possessionWithKnowledge.isFactorsForActivationCommit)
+        XCTAssertFalse(Authentication.Factors.possessionWithBiometry.isFactorsForActivationCommit)
     }
 }

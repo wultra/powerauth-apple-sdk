@@ -17,7 +17,7 @@
 import XCTest
 @testable import PowerAuth
 
-final class InputValidatorTests: XCTestCase {
+final class InputValidatorTests: BaseTestCase {
 
     /// Test Base64 input validator
     func testBase64Validations() throws {

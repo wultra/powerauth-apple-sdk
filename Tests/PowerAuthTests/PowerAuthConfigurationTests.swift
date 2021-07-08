@@ -17,7 +17,7 @@
 import XCTest
 import PowerAuth
 
-final class PowerAuthConfigurationTests: XCTestCase {
+final class PowerAuthConfigurationTests: BaseTestCase {
 
     // MARK: - Instance
     
@@ -126,7 +126,7 @@ final class PowerAuthConfigurationTests: XCTestCase {
                 )
                 XCTFail()
             } catch PowerAuthError.invalidConfiguration(let reason) {
-                XCTAssertEqual(.invalidConfiguration, reason)
+                XCTAssertEqual(.invalidInstanceConfiguration, reason)
             }
         }
     }

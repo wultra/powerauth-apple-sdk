@@ -31,13 +31,17 @@ public struct Authentication {
         case possessionWithKnowledge
         /// Calculate signature for possession and biometry factors.
         case possessionWithBiometry
+        /// Commit new activation with possession and knowledge factors.
+        case commitWithKnowledge
+        /// Commit new activation with possession, knowledge and biometry factors.
+        case commitWithKnowledgeAndBiometry
     }
     
     /// Combination of factors for the signature calculation.
     public let factors: Factors
 
     /// User's password, must be provided for `Factors.possession`
-    let password: Password?
+    let password: PowerAuthCore.Password?
     /// LAContext for the biometric authentication if `Factors.possessionWithBiometry` is used. It's required
     /// for such combination of factors, unless you provide `customBiometryKey`.
     let localAuthentication: LAContext?
@@ -48,6 +52,70 @@ public struct Authentication {
     let customBiometryKey: Data?
 }
 
+// MARK: - Authentication for commit
+
+public extension Authentication {
+
+    /// Create `Authentication` structure configured for activation commit with possession and knowledge factors.
+    /// - Parameters:
+    ///   - password: `PowerAuthCore.Password` object with user's password.
+    ///   - customPossessionKey: Optional possession key. If not provided, then the default possession key will be used.
+    /// - Returns: `Authentication` configured for activation commit with possession and knowledge factors.
+    static func commitWithKnowledge(password: PowerAuthCore.Password, customPossessionKey: Data? = nil) -> Authentication {
+        Authentication(
+            factors: .commitWithKnowledge,
+            password: password,
+            localAuthentication: nil,
+            customPossessionKey: customPossessionKey,
+            customBiometryKey: nil)
+    }
+    
+    /// Create `Authentication` structure configured for activation commit with possession and knowledge factors.
+    /// - Parameters:
+    ///   - password: String with user's password.
+    ///   - customPossessionKey: Optional possession key. If not provided, then the default possession key will be used.
+    /// - Returns: `Authentication` configured for activation commit with possession and knowledge factors.
+    static func commitWithKnowledge(password: String, customPossessionKey: Data? = nil) -> Authentication {
+        Authentication(
+            factors: .commitWithKnowledge,
+            password: Password(string: password),
+            localAuthentication: nil,
+            customPossessionKey: customPossessionKey,
+            customBiometryKey: nil)
+    }
+    
+    /// Create `Authentication` structure configured for activation commit with possession, knowledge and biometry factors.
+    /// - Parameters:
+    ///   - password: `PowerAuthCore.Password` object with user's password.
+    ///   - customBiometryKey: Optional biometry key. If not provided, then new biometry key will be configured.
+    ///   - customPossessionKey: Optional possession key. If not provided, then the default possession key will be used.
+    /// - Returns: `Authentication` structure configured for activation commit with possession, knowledge and biometry factors.
+    static func commitWithKnowledgeAndBiometry(password: PowerAuthCore.Password, customBiometryKey: Data? = nil, customPossessionKey: Data? = nil) -> Authentication {
+        Authentication(
+            factors: .commitWithKnowledgeAndBiometry,
+            password: password,
+            localAuthentication: nil,
+            customPossessionKey: customPossessionKey,
+            customBiometryKey: customBiometryKey)
+    }
+    
+    /// Create `Authentication` structure configured for activation commit with possession, knowledge and biometry factors.
+    /// - Parameters:
+    ///   - password: String with user's password.
+    ///   - customBiometryKey: Optional biometry key. If not provided, then new biometry key will be configured.
+    ///   - customPossessionKey: Optional possession key. If not provided, then the default possession key will be used.
+    /// - Returns: `Authentication` structure configured for activation commit with possession, knowledge and biometry factors.
+    static func commitWithKnowledgeAndBiometry(password: String, customBiometryKey: Data? = nil, customPossessionKey: Data? = nil) -> Authentication {
+        Authentication(
+            factors: .commitWithKnowledgeAndBiometry,
+            password: Password(string: password),
+            localAuthentication: nil,
+            customPossessionKey: customPossessionKey,
+            customBiometryKey: customBiometryKey)
+    }
+}
+
+// MARK: - Authentication for signature computation
 
 public extension Authentication {
     
@@ -128,19 +196,33 @@ public extension Authentication {
 extension Authentication {
     
     /// Internal function that create `PowerAuthCore.SignatureFactorkKeys` object created from this structure data.
-    /// - Parameter dataProvider: `DataProvider` that provide factor keys.
-    /// - Throws: `PowerAuthError.internalError` in case that unhandled combination of factor and associated data is detected.
+    /// - Parameters:
+    ///   - dataProvider: `DataProvider` that provide factor keys.
+    ///   - firstLock: If `true` then the missing keys are created automatically.
+    /// - Throws:
+    ///   - `PowerAuthError.invalidAuthenticationData` in case that some required data is not provided.
+    ///   - `PowerAuthError.internalError` in case that password object is not provided.
     /// - Returns: `PowerAuthCore.SignatureFactorkKeys` object created from this structure data.
-    func getSignatureFactorKeys(with dataProvider: DataProvider) throws -> PowerAuthCore.SignatureFactorkKeys {
+    func getSignatureFactorKeys(with dataProvider: DataProvider, firstLock: Bool = false) throws -> PowerAuthCore.SignatureFactorkKeys {
         let possessionKey = try customPossessionKey ?? dataProvider.possessionFactorEncryptionKey()
+        if factors == .commitWithKnowledge || factors == .commitWithKnowledgeAndBiometry || factors == .possessionWithKnowledge {
+            // Test for password existence
+            guard let password = password else {
+                // This is internal error, so we have to fix how `Authentication` object is constructed.
+                throw PowerAuthError.internalError(reason: "Password is required but not provided for \(factors)")
+            }
+            // TODO: This is also tested in PowerAuthCore, so we should report a special error code from core and wrap it automatically
+            guard password.length() >= Constants.KeySizes.MIN_PASSWORD_LENGTH else {
+                throw PowerAuthError.invalidAuthenticationData(reason: .passwordIsTooShort)
+            }
+        }
         switch factors {
             case .possession:
                 return SignatureFactorkKeys(possessionKey: possessionKey, biometryKey: nil, password: nil)
+                
             case .possessionWithKnowledge:
-                guard let pasword = password else {
-                    throw PowerAuthError.internalError(reason: "Password is required but not provided")
-                }
-                return SignatureFactorkKeys(possessionKey: possessionKey, biometryKey: nil, password: pasword)
+                return SignatureFactorkKeys(possessionKey: possessionKey, biometryKey: nil, password: password)
+                
             case .possessionWithBiometry:
                 let biometryKey: Data
                 if let customBiometryKey = customBiometryKey {
@@ -148,9 +230,25 @@ extension Authentication {
                 } else if let localAuthentication = localAuthentication {
                     biometryKey = try dataProvider.biometryFactorEncryptionKey(authentication: localAuthentication)
                 } else {
-                    throw PowerAuthError.internalError(reason: "Biometry factor key is required but not provided")
+                    throw PowerAuthError.invalidAuthenticationData(reason: .localAuthenticationContextIsMissing)
                 }
                 return SignatureFactorkKeys(possessionKey: possessionKey, biometryKey: biometryKey, password: nil)
+                
+            case .commitWithKnowledge:
+                return SignatureFactorkKeys(possessionKey: possessionKey, biometryKey: nil, password: password)
+                
+            case .commitWithKnowledgeAndBiometry:
+                let biometryKey = try customBiometryKey ?? CryptoUtils.randomBytes(count: Constants.KeySizes.SIGNATURE_FACTOR_KEY_SIZE)
+                try dataProvider.save(biometryFactorEncryptionKey: biometryKey)
+                return SignatureFactorkKeys(possessionKey: possessionKey, biometryKey: biometryKey, password: password)
         }
+    }
+}
+
+extension Authentication.Factors {
+    
+    /// Contains `true` if factors combination represents first activation commit.
+    var isFactorsForActivationCommit: Bool {
+        return self == .commitWithKnowledge || self == .commitWithKnowledgeAndBiometry
     }
 }
