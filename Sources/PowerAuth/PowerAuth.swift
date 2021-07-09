@@ -76,6 +76,8 @@ public final class PowerAuth {
     
     /// Restore internal Session's state.
     /// - Throws:
+    ///   - `PowerAuthError.invalidConfiguration` in case that some configuration parameter is invalid.
+    ///   - `PowerAuthError` for all othher failures.
     func restoreSessionState() throws {
         guard session.hasValidSetup else {
             D.error("PowerAuthCore.Session has invalid setup.")

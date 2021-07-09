@@ -51,12 +51,13 @@ public extension PowerAuth {
     /// - Parameters:
     ///   - callbackQueue: `DispatchQueue` to execute callback with operation result. The default queue is `.main`.
     ///   - callback: Callback that receive result from fetch status operation.
+    ///   - result: Result with `ActivationStatus` structure in case of success.
     /// - Throws:
     ///   - `PowerAuthError.invalidActivationState` in case that activation is missing or is in wrong state.
     /// - Returns: `OperationTask` associated with the running request.
-    func fetchActivationStatus(callbackQueue: DispatchQueue = .main, callback: (Result<ActivationStatus, PowerAuthError>) -> Void) throws -> OperationTask {
+    func fetchActivationStatus(callbackQueue: DispatchQueue = .main, callback: (_ result: Result<ActivationStatus, PowerAuthError>) -> Void) throws -> OperationTask {
         guard hasValidActivation else {
-            throw PowerAuthError.invalidActivationState
+            throw PowerAuthError.invalidActivationState(reason: .missingActivation)
         }
         D.notImplementedYet()
     }

@@ -39,8 +39,29 @@ public enum PowerAuthError: Error {
     /// The provided parameter to function is not valid. Please check the debug log for more details.
     case invalidParameter
     
+    
+    /// The underlying reason the `.invalidActivationState` error occured.
+    public enum ActivationStateFailureReason {
+        
+        /// `PowerAuth` instance has already a valid activation.
+        case activationIsPresent
+        
+        /// `PowerAuth` instance has already pending an activation process.
+        case pendingActivation
+        
+        /// `PowerAuth` instance has no activation.
+        case missingActivation
+        
+        /// TODO: Temporary reason for errors reported from PowerAuthCore.
+        ///       We should enhance error codes from core to better match wrong states.
+        case other
+        
+        /// `PowerAuth` instance already has a biometry factor key configured.
+        case biometryFactorAlreadySet
+    }
+    
     /// The operation was requested in wrong `PowerAuth` activation state.
-    case invalidActivationState
+    case invalidActivationState(reason: ActivationStateFailureReason)
     
     
     // Activation
@@ -77,6 +98,8 @@ public enum PowerAuthError: Error {
         case localAuthenticationContextIsMissing
         /// `Authentication` structure contains too short password.
         case passwordIsTooShort
+        /// `Authentication` structure contains
+        case requiredFactorIsMissing
     }
     
     /// Data provided to `Authentication` structure are invalid

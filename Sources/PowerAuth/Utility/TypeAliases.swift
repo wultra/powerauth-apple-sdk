@@ -18,3 +18,7 @@ import Foundation
 import PowerAuthShared
 
 typealias D = PowerAuthDebug
+
+#if os(watchOS)
+#error("watchOS is not supported")
+#endif

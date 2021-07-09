@@ -25,7 +25,7 @@ public struct PowerAuthConfiguration {
     /// Identifier of the `PowerAuth` instance, used as a 'key' to store session state in the session state keychain.
     public let instanceId: String
     
-    /// Base URL to the PowerAuth Standard RESTful API (the URL part before "/pa/...").
+    /// Base URL to the PowerAuth Standard RESTful API (the URL part before `"/pa/..."`).
     public let baseEndpointUrl: URL
     
     /// `APPLICATION_KEY` constant as defined in PowerAuth specification - a key identifying an application version.
@@ -58,7 +58,7 @@ public struct PowerAuthConfiguration {
     /// Construct configuration for `PowerAuth` class instance.
     /// - Parameters:
     ///   - instanceId: Identifier of the `PowerAuth` instance, used as a 'key' to store session state in the session state keychain.
-    ///   - baseEndpointUrl: Base URL to the PowerAuth Standard RESTful API (the URL part before "/pa/...").
+    ///   - baseEndpointUrl: Base URL to the PowerAuth Standard RESTful API (the URL part before `"/pa/..."`).
     ///   - applicationKey: `APPLICATION_KEY` constant as defined in PowerAuth specification - a key identifying an application version.
     ///   - applicationSecret: `APPLICATION_SECRET` constant as defined in PowerAuth specification - a secret associated with an application version.
     ///   - masterServerPublicKey: `KEY_SERVER_MASTER_PUBLIC` constant as defined in PowerAuth specification - a master server public key.

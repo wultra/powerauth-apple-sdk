@@ -40,6 +40,9 @@ public struct Authentication {
     /// Combination of factors for the signature calculation.
     public let factors: Factors
 
+    // TODO: Make this structure serializable with using `PowerAuthCore.SignatureFactorkKeys` as a construction option.
+    //       This is required by React Native that must keep object somehow in JS context.
+    
     /// User's password, must be provided for `Factors.possession`
     let password: PowerAuthCore.Password?
     /// LAContext for the biometric authentication if `Factors.possessionWithBiometry` is used. It's required
@@ -241,6 +244,35 @@ extension Authentication {
                 let biometryKey = try customBiometryKey ?? CryptoUtils.randomBytes(count: Constants.KeySizes.SIGNATURE_FACTOR_KEY_SIZE)
                 try dataProvider.save(biometryFactorEncryptionKey: biometryKey)
                 return SignatureFactorkKeys(possessionKey: possessionKey, biometryKey: biometryKey, password: password)
+        }
+    }
+    
+    
+    /// Validate authentication structure whether is configured for required list of factors for data signing.
+    /// - Parameter requiredFactors: List of required factors that must be configured in authentication structure.
+    /// - Throws: `PowerAuthError.invalidAuthenticationData` with proper reason.
+    func validate(factorsForSigning requiredFactors: [Authentication.Factors]) throws {
+        guard requiredFactors.contains(factors) else {
+            if factors.isFactorsForActivationCommit {
+                throw PowerAuthError.invalidAuthenticationData(reason: .authenticationForSigningIsRequired)
+            }
+            throw PowerAuthError.invalidAuthenticationData(reason: .requiredFactorIsMissing)
+        }
+    }
+    
+    
+    /// Validate authentication structure whether is configured for commit or signing operation and throws
+    /// `PowerAuthError.invalidAuthenticationData` error if structure contains wrong class of factors.
+    ///
+    /// - Parameter requireCommit: If `true` then factors for commit is required.
+    /// - Throws: `PowerAuthError.invalidAuthenticationData` in case that structure contains wrong class of factors.
+    func validate(factorsForCommit requireCommit: Bool) throws {
+        guard factors.isFactorsForActivationCommit == requireCommit else {
+            if requireCommit {
+                throw PowerAuthError.invalidAuthenticationData(reason: .authenticationForCommitIsRequired)
+            } else {
+                throw PowerAuthError.invalidAuthenticationData(reason: .authenticationForSigningIsRequired)
+            }
         }
     }
 }

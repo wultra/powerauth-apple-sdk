@@ -53,7 +53,7 @@ extension PowerAuthError {
             case .wrongCode:
                 return .invalidActivationData(reason: .wrongActivationCode)
             case .wrongState:
-                return .invalidActivationState
+                return .invalidActivationState(reason: .other)
             case .wrongParam:
                 return .invalidParameter
             default:
