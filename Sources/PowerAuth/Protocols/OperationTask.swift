@@ -16,7 +16,7 @@
 
 import Foundation
 
-/// Protocol representing an asynchronous operation created in PowerAuth SDK.
+/// Protocol representing an asynchronous cancellable operation created in PowerAuth SDK.
 public protocol OperationTask {
     
     /// Flag indicating if the task was cancelled.

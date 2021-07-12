@@ -33,7 +33,7 @@ public final class PowerAuth {
     let httpClient: HttpClient
     
     /// Thread synchronization primitive.
-    let lock: Lock = Lock()
+    let lock: Locking
     
     /// Contains last fetched activation status.
     /// Use `lastFetchedActivationStatus` to access it internally.
@@ -49,7 +49,7 @@ public final class PowerAuth {
     /// - Throws:
     ///   - `PowerAuthError.invalidConfiguration` in case that some configuration parameter is invalid.
     ///   - `PowerAuthError` for all othher failures.
-    internal init(
+    init(
         configuration: PowerAuthConfiguration,
         dataProvider: DataProvider,
         httpClient: HttpClient) throws {
@@ -57,6 +57,7 @@ public final class PowerAuth {
         self.configuration = configuration
         self.dataProvider = dataProvider
         self.httpClient = httpClient
+        self.lock = RecursiveLock()
         
         try restoreSessionState()
     }

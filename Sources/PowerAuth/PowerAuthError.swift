@@ -52,12 +52,15 @@ public enum PowerAuthError: Error {
         /// `PowerAuth` instance has no activation.
         case missingActivation
         
+        /// `PowerAuth` instance already has a biometry factor key configured.
+        case biometryFactorAlreadySet
+        
+        /// `PowerAuth` instance doesn't contain an activation recovery data.
+        case missingActivationRecoveryData
+        
         /// TODO: Temporary reason for errors reported from PowerAuthCore.
         ///       We should enhance error codes from core to better match wrong states.
         case other
-        
-        /// `PowerAuth` instance already has a biometry factor key configured.
-        case biometryFactorAlreadySet
     }
     
     /// The operation was requested in wrong `PowerAuth` activation state.

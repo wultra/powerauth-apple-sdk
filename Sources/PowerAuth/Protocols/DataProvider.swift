@@ -18,7 +18,7 @@ import Foundation
 import PowerAuthShared
 import LocalAuthentication
 
-/// The `DataProvider` protocol defines interface to access various persistent data
+/// The `DataProvider` protocol defines inernal interface to access various persistent data
 /// stored for `PowerAuth` class purposes.
 protocol DataProvider {
     
