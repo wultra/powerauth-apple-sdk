@@ -42,140 +42,140 @@ public struct Activation {
     let activationCode: PowerAuthCore.ActivationCode?
     /// Contains identity attributes that depends on the type of the activation.
     let identityAttributes: [String:String]
-    /// Contains activation name in case that the it was set in builder.
+    /// Contains activation name in case that the it was set in constructor.
     let name: String?
-    /// Contains extra attributes string in case it was set in builder.
+    /// Extra attributes of the activation, used for application specific purposes (for example, info about the client
+    /// device or system). This extras string will be associated with the activation record on PowerAuth Server.
     let extras: String?
-    /// Contains custom attributes dictionary in case it was set in builder.
+    /// Custom attributes dictionary that are processed on Intermediate Server Application. Note that this custom
+    /// data will not be associated with the activation record on PowerAuth Server.
     let customAttributes: [String:Any]?
-    /// Contains additional activation OTP in case it was set in builder.
+    /// Additional activation OTP that can be used only with a regular activation, by activation code.
     let additionalActivationOtp: String?
-}
-
-public extension Activation {
     
-    /// Class that builds `Activation` structure.
-    class Builder {
-        
-        let activationType: ActivationType
-        let identityAttributes: [String:String]
-        var activationCode: PowerAuthCore.ActivationCode?
-        var name: String?
-        var extras: String?
-        var customAttributes: [String:Any]?
-        var additionalActivationOtp: String?
-        
-        /// Construct `Builder` for building activation with an already parsed activation code.
-        ///
-        /// - Parameters:
-        ///   - activationCode: Activation code, obtained either via QR code scanning or by manual entry.
-        ///   - activationName: Activation name to be used for the activation.
-        /// - Throws: `PowerAuthError.invalidActivationData` in case that wrong activation code is provided.
-        public init(withActivationCode activationCode: ActivationCode, activationName: String? = nil) {
-            self.activationType = .activationCode
-            self.identityAttributes = [ "code" : activationCode.activationCode ]
-            self.activationCode = activationCode.coreActivationCode
-            self.name = activationName
-        }
-        
-        /// Construct `Builder` for building activation with an activation code. The activation code may contain
-        /// an optional signature part, in case that it is scanned from QR code.
-        ///
-        /// - Parameters:
-        ///   - activationCode: Activation code, obtained either via QR code scanning or by manual entry.
-        ///   - activationName: Activation name to be used for the activation.
-        /// - Throws: `PowerAuthError.invalidActivationData` in case that wrong activation code is provided.
-        public init(withActivationCode activationCode: String, activationName: String? = nil) throws {
-            guard let code = ActivationCodeUtil.parse(fromActivationCode: activationCode) else {
-                throw PowerAuthError.invalidActivationData(reason: .wrongActivationCode)
+    // MARK: Regular activation
+    
+    /// Construct `Activation` with an already parsed activation code for a regular activation creation process.
+    ///
+    /// - Parameters:
+    ///   - activationCode: Activation code, obtained either via QR code scanning or by manual entry.
+    ///   - activationName: Activation name to be used for the activation.
+    ///   - extras: Extra attributes of the activation, used for application specific purposes.
+    ///   - customAttributes: Custom attributes dictionary that are processed on Intermediate Server Application.
+    ///   - additionalActivationOtp: Additional activation OTP.
+    /// - Throws:
+    ///   - `PowerAuthError.invalidActivationData` if additional activation OTP contains an empty string.
+    public init(withActivationCode activationCode: ActivationCode,
+                activationName: String? = nil,
+                extras: String? = nil,
+                customAttributes: [String:Any]? = nil,
+                additionalActivationOtp: String? = nil) throws {
+        self.activationType = .activationCode
+        self.activationCode = activationCode.coreActivationCode
+        self.identityAttributes = [ "code" : activationCode.activationCode ]
+        self.name = activationName
+        self.extras = extras
+        self.customAttributes = customAttributes
+        self.additionalActivationOtp = additionalActivationOtp
+        // Validate
+        if let additionalActivationOtp = additionalActivationOtp {
+            if additionalActivationOtp.isEmpty {
+                throw PowerAuthError.invalidActivationData(reason: .emptyOtp)
             }
-            self.activationType = .activationCode
-            self.identityAttributes = [ "code" : code.activationCode ]
-            self.activationCode = code
-            self.name = activationName
         }
-        
-        /// Construct `Builder` for building activation with a recovery code and PUK.
-        ///
-        /// - Parameters:
-        ///   - recoveryCode: Recovery code, obtained either via QR code scanning or by manual entry.
-        ///   - puk: PUK obtained by manual entry.
-        ///   - activationName: Activation name to be used for the activation.
-        /// - Throws: `PowerAuthError.invalidActivationData` in case that wrong recovery code, or wrong PUK is provided.
-        public init(withRecoveryCode recoveryCode: String, puk: String, activationName: String? = nil) throws {
-            guard let code = ActivationCodeUtil.parse(fromRecoveryCode: recoveryCode) else {
-                throw PowerAuthError.invalidActivationData(reason: .wrongRecoveryCode)
+    }
+    
+    /// Construct `Activation` with an already parsed activation code for a regular activation creation process.
+    /// The activation code may contain an optional signature part, in case that it is scanned from QR code.
+    ///
+    /// - Parameters:
+    ///   - activationCode: Activation code, obtained either via QR code scanning or by manual entry.
+    ///   - activationName: Activation name to be used for the activation.
+    ///   - extras: Extra attributes of the activation, used for application specific purposes.
+    ///   - customAttributes: Custom attributes dictionary that are processed on Intermediate Server Application.
+    ///   - additionalActivationOtp: Additional activation OTP.
+    /// - Throws:
+    ///   - `PowerAuthError.invalidActivationData` in case that activation code has wrong format.
+    ///   - `PowerAuthError.invalidActivationData` in case that additional activation OTP contains an empty string.
+    public init(withActivationCode activationCode: String,
+                activationName: String? = nil,
+                extras: String? = nil,
+                customAttributes: [String:Any]? = nil,
+                additionalActivationOtp: String? = nil) throws {
+        guard let code = ActivationCodeUtil.parse(fromActivationCode: activationCode) else {
+            throw PowerAuthError.invalidActivationData(reason: .wrongActivationCode)
+        }
+        self.activationType = .activationCode
+        self.activationCode = code
+        self.identityAttributes = [ "code" : code.activationCode ]
+        self.name = activationName
+        self.extras = extras
+        self.customAttributes = customAttributes
+        self.additionalActivationOtp = additionalActivationOtp
+        // Validate
+        if let additionalActivationOtp = additionalActivationOtp {
+            if additionalActivationOtp.isEmpty {
+                throw PowerAuthError.invalidActivationData(reason: .emptyOtp)
             }
-            guard ActivationCodeUtil.validateRecoveryPuk(puk) else {
-                throw PowerAuthError.invalidActivationData(reason: .wrongRecoveryPuk)
-            }
-            self.activationType = .recoveryCode
-            self.identityAttributes = [ "recoveryCode" : code.activationCode, "puk": puk ]
-            self.name = activationName
         }
-        
-        /// Construct `Builder` for building activation with identity attributes, for custom activaton purposes.
-        ///
-        /// - Parameters:
-        ///   - identityAttributes: Custom activation parameters that are used to prove identity of a user.
-        ///   - activationName: Activation name to be used for the activation.
-        public init(withIdentityAttributes identityAttributes: [String:String], activationName: String? = nil) {
-            self.activationType = .custom
-            self.identityAttributes = identityAttributes
-            self.name = activationName
+    }
+    
+    // MARK: Recovery activation
+    
+    /// Construct `Activation` with a recovery code and PUK for a recovery activation process purposes.
+    ///
+    /// - Parameters:
+    ///   - recoveryCode: Recovery code, obtained either via QR code scanning or by manual entry.
+    ///   - puk: PUK obtained by manual entry.
+    ///   - activationName: Activation name to be used for the activation.
+    ///   - extras: Extra attributes of the activation, used for application specific purposes.
+    ///   - customAttributes: Custom attributes dictionary that are processed on Intermediate Server Application.
+    /// - Throws:
+    ///   - `PowerAuthError.invalidActivationData` in case that recovery code or PUK has wrong format.
+    public init(withRecoveryCode recoveryCode: String,
+                puk: String,
+                activationName: String? = nil,
+                extras: String? = nil,
+                customAttributes: [String:Any]? = nil) throws {
+        guard let code = ActivationCodeUtil.parse(fromRecoveryCode: recoveryCode) else {
+            throw PowerAuthError.invalidActivationData(reason: .wrongRecoveryCode)
         }
-        
-        /// Sets extra attributes of the activation, used for application specific purposes (for example, info about the client
-        /// device or system). This extras string will be associated with the activation record on PowerAuth Server.
-        ///
-        /// - Parameter extras: Extra attributes string.
-        /// - Returns: `Builder` instance.
-        public func set(extras: String) -> Builder {
-            self.extras = extras
-            return self
+        guard ActivationCodeUtil.validateRecoveryPuk(puk) else {
+            throw PowerAuthError.invalidActivationData(reason: .wrongRecoveryPuk)
         }
-        
-        /// Sets custom attributes dictionary that are processed on Intermediate Server Application.
-        /// Note that this custom data will not be associated with the activation record on PowerAuth Server.
-        ///
-        /// - Parameter customAttributes: Custom attributes. The provided dictionary must contain only objects that conforms to `Codable` protocol.
-        /// - Returns: `Builder` instance.
-        public func set(customAttributes: [String:Any]) -> Builder {
-            self.customAttributes = customAttributes
-            return self
+        self.activationType = .recoveryCode
+        self.activationCode = nil
+        self.identityAttributes = [ "recoveryCode" : code.activationCode, "puk": puk ]
+        self.name = activationName
+        self.extras = extras
+        self.customAttributes = customAttributes
+        self.additionalActivationOtp = nil
+    }
+    
+    // MARK: Custom activation
+    
+    
+    /// Construct `Activation` with identity attributes, for custom activaton purposes.
+    /// - Parameters:
+    ///   - identityAttributes: Custom activation parameters that are used to prove identity of a user.
+    ///   - activationName: Activation name to be used for the activation.
+    ///   - extras: Extra attributes of the activation, used for application specific purposes.
+    ///   - customAttributes: Custom attributes dictionary that are processed on Intermediate Server Application.
+    /// - Throws:
+    ///   - `PowerAuthError.invalidActivationData` in case that identity attributes is empty dictionary.
+    public init(withIdentityAttributes identityAttributes: [String:String],
+                activationName: String? = nil,
+                extras: String? = nil,
+                customAttributes: [String:Any]? = nil) throws {
+        guard !identityAttributes.isEmpty else {
+            throw PowerAuthError.invalidActivationData(reason: .emptyIdentityAttributes)
         }
-        
-        /// Sets an additional activation OTP that can be used only with a regular activation, by activation code.
-        ///
-        /// - Parameter additionalActivationOtp: Additional activation OTP.
-        /// - Returns: `Builder` instance.
-        public func set(additionalActivationOtp: String) -> Builder {
-            self.additionalActivationOtp = additionalActivationOtp
-            return self
-        }
-        
-        /// Build `Activation` structure from collected parameters.
-        ///
-        /// - Throws: `PowerAuthError.invalidActivationData` in case that invalid combination of activation data is provided.
-        /// - Returns: `Activation` structure created from collected parameters.
-        public func build() throws -> Activation {
-            if let additionalActivationOtp = additionalActivationOtp {
-                if activationType != .activationCode {
-                    throw PowerAuthError.invalidActivationData(reason: .otpInWrongActivationType)
-                }
-                if additionalActivationOtp.isEmpty {
-                    throw PowerAuthError.invalidActivationData(reason: .emptyOtp)
-                }
-            }
-            return Activation(
-                activationType: activationType,
-                activationCode: activationCode,
-                identityAttributes: identityAttributes,
-                name: name,
-                extras: extras,
-                customAttributes: customAttributes,
-                additionalActivationOtp: additionalActivationOtp
-            )
-        }
+        self.activationType = .custom
+        self.activationCode = nil
+        self.identityAttributes = identityAttributes
+        self.name = activationName
+        self.extras = extras
+        self.customAttributes = customAttributes
+        self.additionalActivationOtp = nil
     }
 }

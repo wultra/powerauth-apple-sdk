@@ -76,10 +76,10 @@ public enum PowerAuthError: Error {
         case wrongRecoveryCode
         /// You have provided invalid recovery PUK.
         case wrongRecoveryPuk
-        /// Additional activation OTP can be used only in activation with activation code.
-        case otpInWrongActivationType
         /// Provided additional activation OTP contains an empty string.
         case emptyOtp
+        /// Identity attributes provided for a custom attributes is empty.
+        case emptyIdentityAttributes
     }
     
     /// Data provided to `Activation` structure are invalid.
