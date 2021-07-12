@@ -28,6 +28,9 @@ Pod::Spec.new do |s|
     # Sources
     s.source_files          = 'Sources/PowerAuth/**/*.swift'
     
+    # Dependencies
+    s.dependency 'PowerAuthShared', '~> 0.0.2'
+    
     # Tests
     #s.test_spec do |ts|
     #  ts.source_files = 'Tests/PowerAuth/**/*.swift'

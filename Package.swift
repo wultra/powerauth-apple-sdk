@@ -1,4 +1,4 @@
-// swift-tools-version:5.3
+// swift-tools-version:5.4
 
 import PackageDescription
 
@@ -15,11 +15,13 @@ let package = Package(
             targets: ["PowerAuth"]),
     ],
     dependencies: [
+        .package(name: "PowerAuthShared", url: "https://github.com/wultra/powerauth-apple-shared.git", .branch("develop")),
+        .package(name: "PowerAuthCore", url: "https://github.com/wultra/powerauth-client-core.git", .branch("beta-releases"))
     ],
     targets: [
         .target(
             name: "PowerAuth",
-            dependencies: []),
+            dependencies: ["PowerAuthShared", "PowerAuthCore"]),
         .testTarget(
             name: "PowerAuthTests",
             dependencies: ["PowerAuth"]),
