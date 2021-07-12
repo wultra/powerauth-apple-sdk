@@ -199,7 +199,7 @@ public struct PowerAuthConfiguration {
         public let possessionKeyName: String
         
         /// This value specifies 'key' used to store this PowerAuth instance's biometry related key in the biometry key keychain.
-        /// If not altered in `Builder` then value from `PowerAuthConfiguration.instanceId` is used.
+        /// If not set then value from `PowerAuthConfiguration.instanceId` is used.
         public let biometryKeyName: String?
         
         /// Default `PowerAuthConfiguration.Keychains`.
@@ -225,7 +225,7 @@ public struct PowerAuthConfiguration {
         ///   - tokenStoreKeychainName: Name of the Keychain service used to store content of `PowerAuthToken` objects.
         ///   - possessionKeyName: Name of the Keychain key used to store possession fator related key in an associated service.
         ///   - biometryKeyName: This value specifies 'key' used to store this PowerAuth instance's biometry related key in the biometry key keychain.
-        ///     If not altered in `Builder` then value from `PowerAuthConfiguration.instanceId` is used.
+        ///     If not altered set then value from `PowerAuthConfiguration.instanceId` is used.
         /// - Throws: `PowerAuthError.invalidConfiguration` in case configuration contains invalid data.
         public init(
             accessGroupName: String? = nil,

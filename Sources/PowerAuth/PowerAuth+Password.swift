@@ -25,11 +25,10 @@ public extension PowerAuth {
     ///   - password: `PowerAuthCore.Password` object with user's password to validate.
     ///   - callbackQueue: `DispatchQueue` to execute callback with operation result. The default queue is `.main`.
     ///   - callback: Callback that receive result from password validation.
-    ///   - result: Result that is always `true` in case of success.
-    /// - Throws:
-    ///   - `PowerAuthError.invalidActivationState` in case that instance has no activation.
+    ///   - result: Result that is always `true` in case of success. The following errors can occur in case of failure:
+    ///     - `PowerAuthError.invalidActivationState` in case that instance has no activation.
     /// - Returns: `OperationTask` associated with the running request.
-    func validatePassword(password: PowerAuthCore.Password, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<Bool, PowerAuthError>) -> Void) throws -> OperationTask {
+    func validatePassword(password: PowerAuthCore.Password, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<Bool, PowerAuthError>) -> Void) -> OperationTask {
         D.notImplementedYet()
     }
     
@@ -39,12 +38,11 @@ public extension PowerAuth {
     ///   - password: String with user's password to validate.
     ///   - callbackQueue: `DispatchQueue` to execute callback with operation result. The default queue is `.main`.
     ///   - callback: Callback that receive result from password validation.
-    ///   - result: Result that is always `true` in case of success.
-    /// - Throws:
-    ///   - `PowerAuthError.invalidActivationState` in case that instance has no activation.
+    ///   - result: Result that is always `true` in case of success. The following errors can occur in case of failure:
+    ///     - `PowerAuthError.invalidActivationState` in case that instance has no activation.
     /// - Returns: `OperationTask` associated with the running request.
-    func validatePassword(password: String, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<Bool, PowerAuthError>) -> Void) throws -> OperationTask {
-        try validatePassword(password: Password(string: password), callbackQueue: callbackQueue, callback: callback)
+    func validatePassword(password: String, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<Bool, PowerAuthError>) -> Void) -> OperationTask {
+        validatePassword(password: Password(string: password), callbackQueue: callbackQueue, callback: callback)
     }
     
     /// Change the password, validate old password by calling a PowerAuth Standard RESTful API endpoint `/pa/signature/validate`.
@@ -54,11 +52,10 @@ public extension PowerAuth {
     ///   - new: `PowerAuthCore.Password` object with new password, to be set in case authentication with old password passes.
     ///   - callbackQueue: `DispatchQueue` to execute callback with operation result. The default queue is `.main`.
     ///   - callback: Callback that receive result from change password.
-    ///   - result: Result that is always `true` in case of success.
-    /// - Throws:
-    ///   - `PowerAuthError.invalidActivationState` in case that instance has no activation.
+    ///   - result: Result that is always `true` in case of success. The following errors can occur in case of failure:
+    ///     - `PowerAuthError.invalidActivationState` in case that instance has no activation.
     /// - Returns: `OperationTask` associated with the running request.
-    func changePassword(from old: PowerAuthCore.Password, to new: PowerAuthCore.Password, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<Bool, PowerAuthError>) -> Void) throws -> OperationTask {
+    func changePassword(from old: PowerAuthCore.Password, to new: PowerAuthCore.Password, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<Bool, PowerAuthError>) -> Void) -> OperationTask {
         D.notImplementedYet()
     }
     
@@ -69,12 +66,11 @@ public extension PowerAuth {
     ///   - new: String with new password, to be set in case authentication with old password passes.
     ///   - callbackQueue: `DispatchQueue` to execute callback with operation result. The default queue is `.main`.
     ///   - callback: Callback that receive result from change password.
-    ///   - result: Result that is always `true` in case of success.
-    /// - Throws:
-    ///   - `PowerAuthError.invalidActivationState` in case that instance has no activation.
+    ///   - result: Result that is always `true` in case of success. The following errors can occur in case of failure:
+    ///     - `PowerAuthError.invalidActivationState` in case that instance has no activation.
     /// - Returns: `OperationTask` associated with the running request.
-    func changePassword(from old: String, to new: String, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<Bool, PowerAuthError>) -> Void) throws -> OperationTask {
-        try changePassword(from: Password(string: old), to: Password(string: new), callbackQueue: callbackQueue, callback: callback)
+    func changePassword(from old: String, to new: String, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<Bool, PowerAuthError>) -> Void) -> OperationTask {
+        changePassword(from: Password(string: old), to: Password(string: new), callbackQueue: callbackQueue, callback: callback)
     }
     
     

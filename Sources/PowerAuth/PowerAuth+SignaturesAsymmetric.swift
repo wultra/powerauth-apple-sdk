@@ -92,7 +92,8 @@ public extension PowerAuth {
     ///   - data: Data to be signed with the private key.
     ///   - callbackQueue: `DispatchQueue` to execute callback with operation result. The default queue is `.main`.
     ///   - callback: Callback that receive result from data signing operation.
-    ///   - result: Result with `Data` containing calculated signature in case of success.
+    ///   - result: Result with `Data` containing calculated signature in case of success. The following errors can occur in case of failure:
+    ///     - `PowerAuthError.invalidActivationState` - if instance has no activation.
     /// - Returns: `OperationTask` associated with the running request.
     func signDataWithDevicePrivateKey(with authentication: Authentication, data: Data, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<Data, PowerAuthError>) -> Void) -> OperationTask {
         D.notImplementedYet()

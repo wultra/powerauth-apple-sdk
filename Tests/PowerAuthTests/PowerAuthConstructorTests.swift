@@ -23,7 +23,7 @@ final class PowerAuthConstructorTests: BaseTestCase {
     let APP_SECRET = String.randomBase64(dataCount: 16)
     let MASTER_SERVER_PUBLIC_KEY = String.randomBase64(dataCount: 33)
     
-    func testInstanceBuilder() throws {
+    func testInstanceConstruction() throws {
         // Prepare various configs
         let instanceConfig = try PowerAuthConfiguration(
             instanceId: "instance-id",

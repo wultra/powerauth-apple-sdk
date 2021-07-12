@@ -27,18 +27,17 @@ public extension PowerAuth {
     ///   - activation: `Activation` structure with parameters for activation creation.
     ///   - callbackQueue: `DispatchQueue` to execute callback with operation result. The default queue is `.main`.
     ///   - callback: Callback that receive result from create activation operation.
-    ///   - result: Result with `ActivationResult` structure in case of success.
-    /// - Throws:
-    ///   - `PowerAuthError.invalidActivationState` in case that instance has valid or pending activation.
+    ///   - result: Result with `ActivationResult` structure in case of success. The following errors can occur in case of failure:
+    ///     - `PowerAuthError.invalidActivationState` in case that instance has valid or pending activation.
     /// - Returns: `OperationTask` associated with the running request.
-    func create(activation: Activation, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<ActivationResult, PowerAuthError>)->Void) throws -> OperationTask {
-        guard canCreateActivation else {
-            if session.hasValidActivation {
-                throw PowerAuthError.invalidActivationState(reason: .activationIsPresent)
-            } else {
-                throw PowerAuthError.invalidActivationState(reason: .pendingActivation)
-            }
-        }
+    func create(activation: Activation, callbackQueue: DispatchQueue = .main, callback: (_ result: Result<ActivationResult, PowerAuthError>) -> Void) -> OperationTask {
+        // guard canCreateActivation else {
+        //     if session.hasValidActivation {
+        //         throw PowerAuthError.invalidActivationState(reason: .activationIsPresent)
+        //     } else {
+        //         throw PowerAuthError.invalidActivationState(reason: .pendingActivation)
+        //     }
+        // }
         D.notImplementedYet()
     }
     
@@ -105,16 +104,15 @@ public extension PowerAuth {
     ///   - authentication: `Authentication` structure for data signing, that must contain knowledge or biometry factor.
     ///   - callbackQueue: `DispatchQueue` to execute callback with operation result. The default queue is `.main`.
     ///   - callback: Callback that receive result from remove activation operation.
-    ///   - result: Result that is always `true` in case of success.
-    /// - Throws:
-    ///   - `PowerAuthError.invalidAuthenticationData` in case that authentication structure is created for wrong operation type.
-    ///   - `PowerAuthError.invalidActivationState` in case that function is called in wrong state.
+    ///   - result: Result that is always `true` in case of success. The following errors can occur in case of failure:
+    ///     - `PowerAuthError.invalidAuthenticationData` in case that authentication structure is created for wrong operation type.
+    ///     - `PowerAuthError.invalidActivationState` in case that function is called in wrong state.
     /// - Returns: `OperationTask` associated with the running request.
-    func removeActivation(with authentication: Authentication, callbackQueue: DispatchQueue = .main, callback:(_ result: Result<Bool,PowerAuthError>)->Void) throws -> OperationTask {
-        guard hasValidActivation else {
-            throw PowerAuthError.invalidActivationState(reason: .missingActivation)
-        }
-        try authentication.validate(factorsForSigning: [.possessionWithKnowledge, .possessionWithBiometry])
+    func removeActivation(with authentication: Authentication, callbackQueue: DispatchQueue = .main, callback:(_ result: Result<Bool,PowerAuthError>) -> Void) -> OperationTask {
+        // guard hasValidActivation else {
+        //     throw PowerAuthError.invalidActivationState(reason: .missingActivation)
+        // }
+        // try authentication.validate(factorsForSigning: [.possessionWithKnowledge, .possessionWithBiometry])
         D.notImplementedYet()
     }
     

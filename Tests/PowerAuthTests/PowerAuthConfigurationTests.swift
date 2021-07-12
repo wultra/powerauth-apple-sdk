@@ -58,7 +58,7 @@ final class PowerAuthConfigurationTests: BaseTestCase {
         XCTAssertEqual(EEK, config.externalEncryptionKey)
     }
     
-    func testInstanceConfigurationBuilderFailures() throws {
+    func testInstanceConfigurationFailures() throws {
         let BAD_MASTER_KEY = String.randomBase64(dataCount: 16)
         let BAD_APP_SECRET = String.randomBase64(dataCount: 12)
         let BAD_APP_KEY = String.randomBase64(dataCount: 17)
